@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./src/styles.css">
+</head>
+<body>
+    <div id="grid-container" style="width: 100%; height: 600px; overflow: auto; position: relative; border: 1px solid #cbd5e1;">
+    <div id="grid-spacer" style="position: absolute; top: 0; left: 0; pointer-events: none;"></div>
+    <canvas id="my-grid-canvas" style="position: sticky; top: 0; left: 0; display: block;"></canvas>
+    <input id="grid-editor" type="text" style="position: absolute; display: none; border: 2px solid #217346; outline: none; font: 13px Segoe UI; padding: 0 4px; box-sizing: border-box; z-index: 10;" />
+    </div>
+
+    <script type="module" src="./src/script.ts"></script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+Hello @Devs,
+I hope you are making good progress on the previous task. Once the OOP concepts task has been completed, 
+we can move on to the next task, which is implementing the Excel Grid View. 
+Please ensure that the solution follows Object-Oriented Programming (OOP) principles and adheres to 
+standard coding guidelines, including clear code structure, meaningful naming conventions, 
+and appropriate comments.
+
+The implementation should be developed using TypeScript, HTML, and CSS. 
+Have added a few JavaScript/TypeScript tutorial links that you can refer 
+to for understanding the fundamental concepts and implementation approaches.
+ 
+Feel free to contact me or your designated mentors in case of any queries 
+or challenges.
+ 
+1. Look at how excel grid works
+
+Features to implement
+
+---------------------
+
+Use html canvas to create the excel grid.
+ 
+1. Support 1 lakh rows and 500 columns
+
+2. Column resizing should be supported
+
+3. Row resizing should be supported
+
+4. Editing of a cell.
+
+5. Load json data of the following format
+
+    {
+
+        id: 1,
+
+        firstName : Raj,
+
+        lastName : Solanki
+
+        Age: 30
+
+        Salary: 1000000
+
+    }
+ 
+   Generate 50000 records with different values and store them in the json.
+
+    Load them in the excel sheet.
+
+6. Support column selection
+
+7. Support row selection
+
+8. Support cell-range selection
+
+9. Compute count, min, max, sum and average of selected cells if they have numbers.
+
+Please make sure we create separate classes for 
+
+1. Grid
+
+2. Try and create a separate class for each action that you perform.
+
+    For eg: 
+
+            Class for rows and columns
+
+            Class for cells
+
+            Class for selection
+
+            Class for cell ranges           
+
+            Optimize data storage.
+
+3. The actions should be implemented in the form of command pattern. This will automatically support undo-redo.
+ 
+Actions like typing, column resizing, row resizing should be a part of undo - redo.
+ 
+Match the look and feel of the excel grid. Carefully look at the line thickness.
+ 
+ 
+Tutorial Links :
+ 
+ 
+Introduction to Javascript : Introduction to JavaScript
+Intro to ES6	Introduction to ES6+ Tutorial: Learn modern JavaScript features in this free course
+Intro to Type Script 	Introduction to TypeScript
+https://code.tutsplus.com/tutorials/24-javascript-best-practices-for-beginners--net-5399    
+introduction to JSON -  https://www.youtube.com/watch?v=iiADhChRriM 
+HTML string template - Easy Creation of HTML with JavaScript’s Template Strings  
+ 
+ 
+This JavaScript tutorial course teaches you the world most popular programming language in the world through 33 interactive screencasts. You'll l
+ 
