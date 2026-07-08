@@ -9,13 +9,13 @@ interface User {
     salary: number;
 }
 
-function generateData(): User[] {
+function generateData(): Record<string,unknown> {
 
     const firstNames: string[] = ["Emma", "Liam", "Olivia", "Noah", "Ava", "Elijah", "Sophia", "James", "Isabella", "William"];
     const lastNames: string[] = ["Adani", "Advani", "Agarwal", "Amarnath", "Amra", "Anand", "Arasaratnam", "Aron", "Badesha"];
 
     const rows: number = 50_000;
-    const list: User[] = [];
+    const list: Record<string,unknown> = {};
 
     const getRandomElement = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]!;
 
@@ -31,7 +31,7 @@ function generateData(): User[] {
             age: getRandomInt(21, 35),
             salary: getRandomInt(700_000, 1_000_000)
         };
-        list.push(row);
+        list[i] = row;
     }
 
     // const filePath = path.join('.', 'data.json');
