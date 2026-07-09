@@ -12,15 +12,20 @@ export function checkFormula(value:string): string{
         const argumentsArray: string[] = match[1].split(",");
         const cells = parseCells(argumentsArray);
         if (cells == null) return "INVALID FORMULA";
+        const cellValues = parseCellData(cells);
+        if (!cellValues[1] || cellValues[0].length === 0){
+            console.log(cellValues[0],cellValues[1]);
+            return "NaN";
+        }
         switch (operation.toLowerCase()){
             case "sum":
-                // console.log(cells);
-
-                return "sum operation";
+                return ""+sum(cellValues[0]);
             case "mea":
-                return "mean operation";
+                return ""+mean(cellValues[0]);
             case "med":
-                return "median operation";
+                return ""+ median(cellValues[0]);
+            case "avg":
+                return ""+ mean(cellValues[0]);
         }
         return "INVALID FORMULA";
     }
@@ -30,13 +35,14 @@ export function checkFormula(value:string): string{
 function parseCells(cells:string[]): string[] | null{
     let cellsParsed: string[] = [];
     cells.forEach(cell => {
-        let key = excelToCoordinates(cell);
+        let key= excelToCoordinatesToValue(cell);
         if (key!=null) cellsParsed.push(key);
     });
     return cellsParsed;
 }
 
-function excelToCoordinates(cell: string): string | null {
+function excelToCoordinatesToValue(cell: string): string | null {
+    const pointerCell = new Cell();
     const cleanCell = cell.toLowerCase().trim();
 
     const match = cleanCell.match(/^([a-z]+)([0-9]+)$/);
@@ -52,10 +58,41 @@ function excelToCoordinates(cell: string): string | null {
         colIndex = colIndex * 26 + charCode;
     }
     colIndex = colIndex - 1;
-    return `${rowIndex},${colIndex}`;
+
+    return pointerCell.bindTo(rowIndex,colIndex).value;
 }
 
-function sum(cells:string[]): string{
-    
-    return "";
+function parseCellData(cells:string[]): [number[], boolean]{
+    let parsedValues:number[] = [];
+    cells.forEach(cell => {
+        // console.log(cell);
+        const value = parseInt(cell);
+        if (Number.isNaN(value)){
+            return [[], false];
+        }
+        else parsedValues.push(value);
+    });
+    return [parsedValues, true];
+}
+
+function sum(cells:number[]): number{
+    let total = 0;
+    for (const num of cells){
+        total += num
+    }
+    return total;
+}
+
+function mean(cells:number[]): number {
+    return sum(cells)/cells.length;
+}
+
+function median(cells:number[]): number {
+    cells = cells.sort((a, b) => a - b);
+    const len = cells.length;
+
+    if (len % 2 == 0){
+        return (cells[len/2]!+ cells[len/2-1]!)/2 ;
+    }
+    else return cells[Math.floor(len/2)]! ;
 }
