@@ -167,7 +167,6 @@ export class GridApplication {
         } else {
             this.isDraggingSelection = true;
             if (this.currentEditingCell) this.commitEditingChanges();
-            console.log("dragging true");
             const target = this.getCellAtPixels(mouseX, mouseY);
             this.grid.selection.selectCell(target.row, target.col);
             this.grid.render();
