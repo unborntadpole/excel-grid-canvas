@@ -8,6 +8,14 @@ export const DEFAULT_COLUMN_WIDTH = 100;
 export const MAX_ROWS = 100000;
 export const MAX_COLUMNS = 50;
 
+declare global {
+    interface Window {
+        __gridAppInstance?: GridApplication;
+    }
+}
 
-const app = new GridApplication();
-app.grid.render();
+if (window.__gridAppInstance) {
+    window.__gridAppInstance.destroy();
+} else {
+    window.__gridAppInstance = new GridApplication();
+}

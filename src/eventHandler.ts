@@ -27,6 +27,8 @@ export class GridApplication {
         this.initCanvasSizing();
         this.updateScrollDimensions();
         this.initListeners();
+
+        this.grid.render();
     }
 
     private initCanvasSizing(): void {    
@@ -117,6 +119,7 @@ export class GridApplication {
         this.editor.addEventListener('blur', this.handleEditorBlur);
         window.addEventListener('keydown', this.handleWindowKeyDown);
         this.fileInput.addEventListener('change', this.handleFileChange);
+        window.addEventListener('resize', this.handleResize);
     }
 
 
@@ -314,5 +317,10 @@ export class GridApplication {
             }
         };
         reader.readAsText(file);
+    };
+
+    private handleResize = (e: Event) => {
+        this.initCanvasSizing();
+        this.grid.render();
     };
 }
