@@ -20,7 +20,6 @@ canvas.style.height = `${container.clientHeight}px`;
 
 export const grid = new Grid(canvas);
 
-(await fetchFromJson());
 
 let isDraggingSelection = false;
 let isResizingColumn = false;
@@ -219,6 +218,12 @@ editor.addEventListener('keydown', (e) => {
 
 editor.addEventListener('blur', () => {
   commitEditingChanges();
+});
+
+window.addEventListener('keydown', async(e) => {
+  if (e.ctrlKey && e.key.toLowerCase() === 'i'){
+    await grid.renderJSON();
+  }
 });
 
 window.addEventListener('keydown', (e) => {

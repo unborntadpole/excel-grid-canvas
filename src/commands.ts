@@ -1,5 +1,6 @@
-import { Cell } from "./cell.js";
+import { Cell, getSPARSECELLDATA, setSPARSECELLDATA, type CellState } from "./cell.js";
 import { Row, Column } from "./rowcolumn.js";
+import { fetchFromJson } from "./fetchFromJson.js";
 
 export interface ICommand{
     execute(): void,
@@ -10,8 +11,8 @@ export class HistoryManager {
     private undoStack : ICommand[] = [];
     private redoStack : ICommand[] = [];
 
-    public executeCommand(command: ICommand): void {
-        command.execute();
+    public async executeCommand(command: ICommand): Promise<void> {
+        await command.execute();
         this.undoStack.push(command);
         this.redoStack = [];
     }
@@ -23,10 +24,10 @@ export class HistoryManager {
         this.redoStack.push(command);
     }
 
-    public redo(): void {
+    public async redo(): Promise<void> {
         const command = this.redoStack.pop();
         if (!command) return;
-        command.execute();
+        await command.execute();
         this.undoStack.push(command);
     }
 
@@ -96,3 +97,30 @@ export class ResizeRowCommand implements ICommand {
         Row.setHeight(this.rowNumber, this.oldHeight);
     }
 }
+
+
+
+export class RenderJsonCommand implements ICommand {
+    private oldValue: Map<string, CellState> | null = null;
+    private newValue: Map<string, CellState> | null = null;
+
+    constructor() {
+    }
+
+    async execute() {
+        if (!this.newValue) {
+            this.oldValue = structuredClone(getSPARSECELLDATA());
+            await fetchFromJson();
+            this.newValue = structuredClone(getSPARSECELLDATA());
+            return;
+        }
+        setSPARSECELLDATA(this.newValue);
+    }
+
+    undo() {
+        if (this.oldValue) {
+            setSPARSECELLDATA(this.oldValue);
+        }
+    }
+}
+

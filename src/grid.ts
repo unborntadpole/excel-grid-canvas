@@ -1,8 +1,9 @@
 import { MAX_ROWS, MAX_COLUMNS } from "./script.js";
 import { Row, Column } from "./rowcolumn.js";
-import { HistoryManager, TypeActionCommand, ResizeColumnCommand, ResizeRowCommand } from "./commands.js";
+import { HistoryManager, TypeActionCommand, ResizeColumnCommand, ResizeRowCommand, RenderJsonCommand } from "./commands.js";
 import { Cell, Selection } from "./cell.js";
 import { checkFormula } from "./formulae.js";
+import { fetchFromJson } from "./fetchFromJson.js";
 
 export class Grid {
     private readonly ctx: CanvasRenderingContext2D;
@@ -37,6 +38,12 @@ export class Grid {
     public typeIntoCell(row: number, col: number, value: string): void {
         const cmd = new TypeActionCommand(row, col, value);
         this.history.executeCommand(cmd);
+        this.render();
+    }
+
+    public async renderJSON(){
+        const cmd = new RenderJsonCommand();
+        await this.history.executeCommand(cmd);
         this.render();
     }
 

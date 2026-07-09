@@ -1,8 +1,15 @@
-interface CellState {
+export interface CellState {
     value: string
 }
+let SPARSE_CELL_DATA = new Map<string, CellState>();
 
-const SPARSE_CELL_DATA = new Map<string, CellState>();
+export function setSPARSECELLDATA(data: Map<string, CellState>){
+    SPARSE_CELL_DATA = structuredClone(data);
+}
+
+export function getSPARSECELLDATA(): Map<string, CellState>{
+    return structuredClone(SPARSE_CELL_DATA);
+}
 
 export class Cell {
     public row: number = 0;

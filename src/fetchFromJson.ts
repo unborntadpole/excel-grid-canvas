@@ -50,7 +50,6 @@ function addToSheet(data: unknown, startKey: string = "0,0"): void {
                     content = typeof rawValue === 'object' ? JSON.stringify(rawValue) : String(rawValue);
                 }
                 
-                // grid.typeIntoCell(currentRow, currentCol, content);
                 cell.bindTo(currentRow, currentCol).setRawValue(content);
                 currentCol++;
             }
