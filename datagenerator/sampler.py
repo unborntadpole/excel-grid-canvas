@@ -18,5 +18,5 @@ for i in range(rows):
     }
     list.append(row)
 
-with open("./src/data.json", 'w') as file:
+with open("./public/data.json", 'w') as file:
     json.dump(list, file, indent=4)

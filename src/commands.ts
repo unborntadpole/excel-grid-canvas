@@ -135,7 +135,7 @@ export class RenderJsonFromFileCommand implements ICommand {
         this.newValue = structuredClone(getSPARSECELLDATA());
     }
 
-    execute() {
+      execute() {
         setSPARSECELLDATA(this.newValue);
     }
 

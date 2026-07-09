@@ -1,6 +1,5 @@
 import { generateData } from "./generator.js";
 import { Cell } from "./cell.js";
-import { grid } from "./script.js";
 
 export var dataStore: Record<string,unknown>;
 

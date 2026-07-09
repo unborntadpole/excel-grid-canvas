@@ -83,7 +83,7 @@ export class Selection {
         this.boundedRange = new CellRange(this.activeRow, this.activeColumn, targetRow, targetCol);
     }
 
-    public evalute(): Record<string, string>{
+    public evaluate(): Record<string, string>{
         if (this.boundedRange === null) return {};
         return getEvaluation(this.boundedRange);
     }
