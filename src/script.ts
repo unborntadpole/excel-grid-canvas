@@ -14,6 +14,8 @@ const container = document.getElementById('grid-container') as HTMLDivElement;
 const spacer = document.getElementById('grid-spacer') as HTMLDivElement;
 const canvas = document.getElementById('my-grid-canvas') as HTMLCanvasElement;
 const editor = document.getElementById('grid-editor') as HTMLInputElement;
+const fileInput = document.getElementById('loaded-file') as HTMLInputElement;
+
 
 canvas.style.width = `${container.clientWidth}px`;
 canvas.style.height = `${container.clientHeight}px`;
@@ -172,7 +174,13 @@ window.addEventListener('mouseup', (e) => {
     grid.resizeRow(activeResizeIndex, Math.max(18, initialSize + delta));
   }
   if (isDraggingSelection){
-    console.log(grid.selection.evalute());
+    const evaluation = grid.selection.evalute();
+    document.getElementById("field-count")!.textContent = evaluation.count!;
+    document.getElementById("field-min")!.textContent = evaluation.min!;
+    document.getElementById("field-max")!.textContent = evaluation.max!;
+    document.getElementById("field-average")!.textContent = evaluation.average!;
+    document.getElementById("field-sum")!.textContent = evaluation.sum!;
+
   }
   isDraggingSelection = false;
   isResizingColumn = false;
@@ -227,6 +235,31 @@ window.addEventListener('keydown', async(e) => {
     await grid.renderJSON();
   }
 });
+
+fileInput.addEventListener('change', async (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    if (!target.files || target.files.length === 0) {
+        console.log("No file selected.");
+        return;
+    }
+    const file = target.files[0]!; 
+    console.log(`Selected file name: ${file.name}`);
+    console.log(`File size: ${file.size} bytes`);
+    const reader = new FileReader();
+    reader.onload = async (e: ProgressEvent<FileReader>) => {
+        try {
+            const rawText = e.target?.result as string;
+            const jsonData = JSON.parse(rawText);
+            await grid.renderJSONFromFile(jsonData);
+            console.log("Successfully parsed JSON data");
+        } catch (error) {
+            console.error("Invalid JSON file uploaded.", error);
+        }
+    };
+    
+    reader.readAsText(file);
+});
+
 
 window.addEventListener('keydown', (e) => {
   if (document.activeElement === editor) return;

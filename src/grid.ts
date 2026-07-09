@@ -1,9 +1,8 @@
 import { MAX_ROWS, MAX_COLUMNS } from "./script.js";
 import { Row, Column } from "./rowcolumn.js";
-import { HistoryManager, TypeActionCommand, ResizeColumnCommand, ResizeRowCommand, RenderJsonCommand } from "./commands.js";
+import { HistoryManager, TypeActionCommand, ResizeColumnCommand, ResizeRowCommand, RenderJsonCommand, RenderJsonFromFileCommand } from "./commands.js";
 import { Cell, Selection } from "./cell.js";
 import { checkFormula } from "./formulae.js";
-import { fetchFromJson } from "./fetchFromJson.js";
 
 export class Grid {
     private readonly ctx: CanvasRenderingContext2D;
@@ -26,11 +25,8 @@ export class Grid {
 
     private initDOM(): void {
         const dpr = window.devicePixelRatio || 1;
-        // Keep CSS style bounds perfectly bound to layout engine expectations
         this.canvas.style.width = `${this.canvas.clientWidth}px`;
         this.canvas.style.height = `${this.canvas.clientHeight}px`;
-        
-        // Scale backing store coordinates to match hardware display pixels
         this.canvas.width = this.canvas.clientWidth * dpr;
         this.canvas.height = this.canvas.clientHeight * dpr;
     }
@@ -43,6 +39,12 @@ export class Grid {
 
     public async renderJSON(){
         const cmd = new RenderJsonCommand();
+        await this.history.executeCommand(cmd);
+        this.render();
+    }
+
+    public async renderJSONFromFile(data: unknown){
+        const cmd = new RenderJsonFromFileCommand(data);
         await this.history.executeCommand(cmd);
         this.render();
     }

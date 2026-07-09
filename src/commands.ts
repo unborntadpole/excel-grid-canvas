@@ -1,6 +1,6 @@
 import { Cell, getSPARSECELLDATA, setSPARSECELLDATA, type CellState } from "./cell.js";
 import { Row, Column } from "./rowcolumn.js";
-import { fetchFromJson } from "./fetchFromJson.js";
+import { addToSheet, fetchFromJson } from "./fetchFromJson.js";
 
 export interface ICommand{
     execute(): void,
@@ -114,6 +114,28 @@ export class RenderJsonCommand implements ICommand {
             this.newValue = structuredClone(getSPARSECELLDATA());
             return;
         }
+        setSPARSECELLDATA(this.newValue);
+    }
+
+    undo() {
+        if (this.oldValue) {
+            setSPARSECELLDATA(this.oldValue);
+        }
+    }
+}
+
+
+export class RenderJsonFromFileCommand implements ICommand {
+    private oldValue: Map<string, CellState>;
+    private newValue: Map<string, CellState>;
+
+    constructor(data: unknown) {
+        this.oldValue = structuredClone(getSPARSECELLDATA());
+        addToSheet(data);
+        this.newValue = structuredClone(getSPARSECELLDATA());
+    }
+
+    execute() {
         setSPARSECELLDATA(this.newValue);
     }
 

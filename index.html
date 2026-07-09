@@ -12,6 +12,16 @@
     <canvas id="my-grid-canvas" style="position: sticky; top: 0; left: 0; display: block;"></canvas>
     <input id="grid-editor" type="text" style="position: absolute; display: none; border: 2px solid #217346; outline: none; font: 13px Segoe UI; padding: 0 4px; box-sizing: border-box; z-index: 10;" />
     </div>
+    <br>
+    <div id="selectionOutput" style="flex-direction: row; display: flex; justify-content: space-evenly;">
+        <label for="loaded-file"><i><u>Upload File</u></i></label>
+        <input type="file" id="loaded-file" accept=".json" hidden>
+        <span>Count: <span id="field-count"></span></span>
+        <span>Min: <span id="field-min"></span></span>
+        <span>Max: <span id="field-max"></span></span>
+        <span>Sum: <span id="field-sum"></span></span>
+        <span>Average: <span id="field-average"></span></span>
+    </div>
 
     <script type="module" src="./src/script.ts"></script>
 </body>

@@ -25,7 +25,7 @@ export const fetchFromJson = async () => {
     addToSheet(dataStore);
 
 };
-function addToSheet(data: unknown, startKey: string = "0,0"): void {
+export function addToSheet(data: unknown, startKey: string = "0,0"): void {
     const [startRow = 0, startCol = 0] = startKey.split(',').map(Number);
     let currentRow = isNaN(startRow) ? 0 : startRow;
     const cell = new Cell();
