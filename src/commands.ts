@@ -129,9 +129,9 @@ export class RenderJsonFromFileCommand implements ICommand {
     private oldValue: Map<string, CellState>;
     private newValue: Map<string, CellState>;
 
-    constructor(data: unknown) {
+    constructor(data: unknown, firstCellKey: string) {
         this.oldValue = structuredClone(getSPARSECELLDATA());
-        addToSheet(data);
+        addToSheet(data, firstCellKey);
         this.newValue = structuredClone(getSPARSECELLDATA());
     }
 

@@ -44,7 +44,7 @@ export class Grid {
     }
 
     public async renderJSONFromFile(data: unknown){
-        const cmd = new RenderJsonFromFileCommand(data);
+        const cmd = new RenderJsonFromFileCommand(data, `${this.selection.activeRow},${this.selection.activeColumn}`);
         await this.history.executeCommand(cmd);
         this.render();
     }

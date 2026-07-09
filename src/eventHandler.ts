@@ -109,9 +109,6 @@ export class GridApplication {
     private initListeners(): void {
         this.container.addEventListener('scroll', this.handleScroll);
         this.canvas.addEventListener('mousedown', this.handleMouseDown);
-        // this.canvas.addEventListener('mouseup', this.handleMouseUp);
-        // this.canvas.addEventListener('mousemove', this.handleMouseMove);
-        // window.addEventListener('mousedown', this.handleMouseDown);
         window.addEventListener('mousemove', this.handleMouseMove);
         window.addEventListener('mouseup', this.handleMouseUp);
         this.canvas.addEventListener('dblclick', this.handleDblClick);
@@ -119,6 +116,7 @@ export class GridApplication {
         this.editor.addEventListener('blur', this.handleEditorBlur);
         window.addEventListener('keydown', this.handleWindowKeyDown);
         this.fileInput.addEventListener('change', this.handleFileChange);
+        this.fileInput.addEventListener('click', this.handleFileClick);
         window.addEventListener('resize', this.handleResize);
     }
 
@@ -126,7 +124,6 @@ export class GridApplication {
     public destroy(): void {
         this.container.removeEventListener('scroll', this.handleScroll);
         this.canvas.removeEventListener('mousedown', this.handleMouseDown);
-        // window.removeEventListener('mousedown', this.handleMouseDown);
         window.removeEventListener('mousemove', this.handleMouseMove);
         window.removeEventListener('mouseup', this.handleMouseUp);
         this.canvas.removeEventListener('dblclick', this.handleDblClick);
@@ -134,6 +131,8 @@ export class GridApplication {
         this.editor.removeEventListener('blur', this.handleEditorBlur);
         window.removeEventListener('keydown', this.handleWindowKeyDown);
         this.fileInput.removeEventListener('change', this.handleFileChange);
+        this.fileInput.removeEventListener('click', this.handleFileClick);
+        window.removeEventListener('resize', this.handleResize);
     }
 
 
@@ -317,6 +316,10 @@ export class GridApplication {
             }
         };
         reader.readAsText(file);
+    };
+    private handleFileClick = (event: Event): void => {
+        const input = event.target as HTMLInputElement;
+        input.value = '';
     };
 
     private handleResize = (e: Event) => {
