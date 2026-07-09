@@ -62,10 +62,9 @@ function excelToCoordinatesToValue(cell: string): string | null {
     return pointerCell.bindTo(rowIndex,colIndex).value;
 }
 
-function parseCellData(cells:string[]): [number[], boolean]{
+export function parseCellData(cells:string[]): [number[], boolean]{
     let parsedValues:number[] = [];
     cells.forEach(cell => {
-        // console.log(cell);
         const value = parseInt(cell);
         if (Number.isNaN(value)){
             return [[], false];
@@ -75,7 +74,7 @@ function parseCellData(cells:string[]): [number[], boolean]{
     return [parsedValues, true];
 }
 
-function sum(cells:number[]): number{
+export function sum(cells:number[]): number{
     let total = 0;
     for (const num of cells){
         total += num
@@ -83,7 +82,7 @@ function sum(cells:number[]): number{
     return total;
 }
 
-function mean(cells:number[]): number {
+export function mean(cells:number[]): number {
     return sum(cells)/cells.length;
 }
 

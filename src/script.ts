@@ -171,7 +171,9 @@ window.addEventListener('mouseup', (e) => {
     Row.setHeight(activeResizeIndex, initialSize);
     grid.resizeRow(activeResizeIndex, Math.max(18, initialSize + delta));
   }
-
+  if (isDraggingSelection){
+    console.log(grid.selection.evalute());
+  }
   isDraggingSelection = false;
   isResizingColumn = false;
   isResizingRow = false;

@@ -1,3 +1,5 @@
+import { getEvaluation } from "./selectionFunctions.js";
+
 export interface CellState {
     value: string
 }
@@ -79,5 +81,10 @@ export class Selection {
 
     public updateDragRange(targetRow: number, targetCol: number): void {
         this.boundedRange = new CellRange(this.activeRow, this.activeColumn, targetRow, targetCol);
+    }
+
+    public evalute(): Record<string, string>{
+        if (this.boundedRange === null) return {};
+        return getEvaluation(this.boundedRange);
     }
 }
