@@ -31,7 +31,7 @@ export function getEvaluation(bRng:CellRange): Record<string,string>{
         min = "" + values[0];
         max = "" + values.at(-1);
         sumString = "" + sum(values);
-        average = "" + mean(values);
+        average = "" + mean(values).toFixed(2);
     }
     return {
         "count" : count,

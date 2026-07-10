@@ -1,7 +1,7 @@
 import { CellRange, CopyPaste } from './cell.js';
 import {Grid} from './grid.js';
 import { Column, Row } from './rowcolumn.js';
-import { MAX_COLUMNS, MAX_ROWS } from './script.js';
+import { HEADER_HEIGHT, HEADER_WIDTH, MAX_COLUMNS, MAX_ROWS, RESIZE_THRESHOLD } from './script.js';
 
 export class GridApplication {
     private container: HTMLDivElement;
@@ -57,25 +57,27 @@ export class GridApplication {
         let totalHeight = 0;
         for (let r = 0; r < MAX_ROWS; r++) totalHeight += Row.getHeight(r);
 
-        this.spacer.style.width = `${totalWidth}px`;
-        this.spacer.style.height = `${totalHeight}px`;
+        this.spacer.style.width = `${totalWidth + HEADER_WIDTH}px`;
+        this.spacer.style.height = `${totalHeight + HEADER_HEIGHT}px`;
     };
 
     private getCellAtPixels(pixelX: number, pixelY: number): { row: number; col: number; x: number; y: number; w: number; h: number } {
         const absoluteX = pixelX + this.grid.scrollX;
         const absoluteY = pixelY + this.grid.scrollY;
 
-        let currentX = 0, col = 0, cellX = 0, cellW = 0;
+        let currentX = 0 + HEADER_WIDTH, col = 0, cellX = 0, cellW = 0;
         for (let c = 0; c < 500; c++) {
             const cw = Column.getWidth(c);
             if (absoluteX >= currentX && absoluteX <= currentX + cw) {
-                col = c; cellX = currentX - this.grid.scrollX; cellW = cw;
+                col = c; 
+                cellX = currentX - this.grid.scrollX; 
+                cellW = cw;
                 break;
             }
             currentX += cw;
         }
 
-        let currentY = 0, row = 0, cellY = 0, cellH = 0;
+        let currentY = 0 + HEADER_HEIGHT, row = 0, cellY = 0, cellH = 0;
         for (let r = 0; r < 100000; r++) {
             const rh = Row.getHeight(r);
             if (absoluteY >= currentY && absoluteY <= currentY + rh) {
@@ -91,18 +93,51 @@ export class GridApplication {
     private checkResizeTarget(pixelX: number, pixelY: number): { type: 'col' | 'row' | null; index: number } {
         const absoluteX = pixelX + this.grid.scrollX;
         const absoluteY = pixelY + this.grid.scrollY;
-        const threshold = 4; 
+        const threshold = RESIZE_THRESHOLD;
 
-        let currentX = 0;
+        let currentX = 0 + HEADER_WIDTH;
         for (let c = 0; c < MAX_COLUMNS; c++) {
             currentX += Column.getWidth(c);
             if (Math.abs(absoluteX - currentX) <= threshold) return { type: 'col', index: c };
         }
 
-        let currentY = 0;
+        let currentY = 0 + HEADER_HEIGHT;
         for (let r = 0; r < MAX_ROWS; r++) {
             currentY += Row.getHeight(r);
             if (Math.abs(absoluteY - currentY) <= threshold) return { type: 'row', index: r };
+        }
+
+        return { type: null, index: -1 };
+    }
+
+    private checkIfHeader(pixelX: number, pixelY: number):{ type: 'col' | 'row' | null; index: number }{
+        const absoluteX = pixelX + this.grid.scrollX;
+        const absoluteY = pixelY + this.grid.scrollY;
+        const threshold = RESIZE_THRESHOLD;
+
+        let currentX = 0 + HEADER_WIDTH;
+        for (let c = 0; c < MAX_COLUMNS; c++) {
+            if (
+                (absoluteX - currentX + threshold) <= Column.getWidth(c) 
+                && (absoluteX-currentX)>threshold
+                && absoluteY <= HEADER_HEIGHT
+            ){
+                return { type: 'col', index: c };
+            }
+            currentX += Column.getWidth(c);
+        }
+
+        let currentY = 0 + HEADER_HEIGHT;
+        for (let r = 0; r < MAX_ROWS; r++) {
+            const rowH = Row.getHeight(r);
+            if (
+                (absoluteY - currentY + threshold) <= rowH 
+                && (absoluteY - currentY)>threshold
+                && absoluteX < HEADER_WIDTH
+            ){
+                return { type: 'row', index: r };
+            }
+            currentY += rowH;
         }
 
         return { type: null, index: -1 };
@@ -160,8 +195,19 @@ export class GridApplication {
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
 
-        const resizeHit = this.checkResizeTarget(mouseX, mouseY);
+        const headerHit = this.checkIfHeader(mouseX, mouseY);
+        if (headerHit.type === 'col') {
+            this.grid.selection.boundedRange = new CellRange(0, headerHit.index, MAX_ROWS, headerHit.index);
+            this.grid.render();
+            return;
+        } else if (headerHit.type === 'row') {
+            this.grid.selection.boundedRange = new CellRange(headerHit.index, 0, headerHit.index, MAX_COLUMNS);
+            this.grid.render();
+            return;
+        }
 
+
+        const resizeHit = this.checkResizeTarget(mouseX, mouseY);
         if (resizeHit.type === 'col') {
             this.isResizingColumn = true;
             this.activeResizeIndex = resizeHit.index;
@@ -286,8 +332,7 @@ export class GridApplication {
         const key = e.key.toLowerCase();
         if (e.ctrlKey && key === 'i') {
             e.preventDefault();
-            if (this.currentSelectedCell) await this.grid.renderJSON(`${this.currentSelectedCell?.row},${this.currentSelectedCell?.col}`);
-            else await this.grid.renderJSON();
+            await this.grid.renderJSON();
             return;
         }
         if (e.ctrlKey && e.code == 'KeyC'){
@@ -379,6 +424,7 @@ export class GridApplication {
         } else if (col == 0){
             this.container.scrollLeft = 0;
         }
+        
         let changeX = 0;
         let changeY = 0;
         if (row > rowlast){
@@ -401,7 +447,6 @@ export class GridApplication {
                 changeX -= Column.getWidth(colT);
             }
         }
-
         this.container.scrollLeft += changeX;
         this.container.scrollTop += changeY;
     }

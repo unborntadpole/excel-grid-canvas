@@ -21,7 +21,7 @@ export function checkFormula(value:string): string{
             case "sum":
                 return ""+sum(cellValues[0]);
             case "mea":
-                return ""+mean(cellValues[0]);
+                return mean(cellValues[0]).toFixed(2);
             case "med":
                 return ""+ median(cellValues[0]);
             case "avg":
