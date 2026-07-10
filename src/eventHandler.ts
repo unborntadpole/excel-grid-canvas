@@ -1,7 +1,7 @@
 import { CellRange, CopyPaste } from './cell.js';
 import {Grid} from './grid.js';
 import { Column, Row } from './rowcolumn.js';
-import { HEADER_HEIGHT, HEADER_WIDTH, MAX_COLUMNS, MAX_ROWS, RESIZE_THRESHOLD } from './script.js';
+import { DEFAULT_COLUMN_WIDTH, DEFAULT_ROW_HEIGHT, HEADER_HEIGHT, HEADER_WIDTH, MAX_COLUMNS, MAX_ROWS, RESIZE_THRESHOLD } from './script.js';
 
 export class GridApplication {
     private container: HTMLDivElement;
@@ -61,12 +61,35 @@ export class GridApplication {
         this.spacer.style.height = `${totalHeight + HEADER_HEIGHT}px`;
     };
 
+    private getCellPosition(row: number, column: number): { x: number; y: number; w: number; h: number } {
+        let X = this.grid.scrollX;
+        let Y = this.grid.scrollY;
+
+        X += HEADER_WIDTH;
+        let w = DEFAULT_COLUMN_WIDTH;
+        for (let c = 0; c < column; c++) {
+            w = Column.getWidth(c);
+            X += w;
+        }
+        w = Column.getWidth(column+1);
+
+        Y = HEADER_HEIGHT;
+        let h = DEFAULT_ROW_HEIGHT;
+        for (let r = 0; r < row; r++) {
+            h = Row.getHeight(r);
+            Y += h;
+        }
+        h = Row.getHeight(row+1);
+
+        return { x: X, y: Y, w: w, h: h };
+    }
+
     private getCellAtPixels(pixelX: number, pixelY: number): { row: number; col: number; x: number; y: number; w: number; h: number } {
         const absoluteX = pixelX + this.grid.scrollX;
         const absoluteY = pixelY + this.grid.scrollY;
 
         let currentX = 0 + HEADER_WIDTH, col = 0, cellX = 0, cellW = 0;
-        for (let c = 0; c < 500; c++) {
+        for (let c = 0; c < MAX_COLUMNS; c++) {
             const cw = Column.getWidth(c);
             if (absoluteX >= currentX && absoluteX <= currentX + cw) {
                 col = c; 
@@ -78,7 +101,7 @@ export class GridApplication {
         }
 
         let currentY = 0 + HEADER_HEIGHT, row = 0, cellY = 0, cellH = 0;
-        for (let r = 0; r < 100000; r++) {
+        for (let r = 0; r < MAX_ROWS; r++) {
             const rh = Row.getHeight(r);
             if (absoluteY >= currentY && absoluteY <= currentY + rh) {
                 row = r; cellY = currentY - this.grid.scrollY; cellH = rh;
@@ -194,6 +217,8 @@ export class GridApplication {
         const rect = this.canvas.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
+        const cellTarget = this.getCellAtPixels(mouseX, mouseY);
+        this.currentSelectedCell = { row: cellTarget.row, col: cellTarget.col };
 
         const headerHit = this.checkIfHeader(mouseX, mouseY);
         if (headerHit.type === 'col') {
@@ -205,7 +230,6 @@ export class GridApplication {
             this.grid.render();
             return;
         }
-
 
         const resizeHit = this.checkResizeTarget(mouseX, mouseY);
         if (resizeHit.type === 'col') {
@@ -223,7 +247,7 @@ export class GridApplication {
             if (this.currentEditingCell) this.commitEditingChanges();
             const target = this.getCellAtPixels(mouseX, mouseY);
             this.grid.selection.selectCell(target.row, target.col);
-            this.currentSelectedCell = { row: target.row, col: target.col };
+            // this.currentSelectedCell = { row: target.row, col: target.col };
             this.grid.render();
         }
     };
@@ -254,7 +278,7 @@ export class GridApplication {
         if (this.isDraggingSelection) {
             const target = this.getCellAtPixels(mouseX, mouseY);
             this.grid.selection.updateDragRange(target.row, target.col);
-            this.currentSelectedCell = {row: target.row, col: target.col}
+            // this.currentSelectedCell = {row: target.row, col: target.col};
             this.grid.render();
             return;
         }
@@ -291,12 +315,14 @@ export class GridApplication {
     };
     private handleDblClick = (e: MouseEvent): void => {
         const rect = this.canvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-        const cellTarget = this.getCellAtPixels(mouseX, mouseY);
-        this.currentEditingCell = { row: cellTarget.row, col: cellTarget.col };
-        this.currentSelectedCell = { row: cellTarget.row, col: cellTarget.col };
-        const currentText = this.grid['pointerCell'].bindTo(cellTarget.row, cellTarget.col).value;
+        // const mouseX = e.clientX - rect.left;
+        // const mouseY = e.clientY - rect.top;
+        // const cellTarget = this.getCellAtPixels(mouseX, mouseY);
+        if (!this.currentSelectedCell) return;
+        this.currentEditingCell = {row:this.currentSelectedCell.row, col:this.currentSelectedCell.col};
+
+        const cellTarget = this.getCellPosition(this.currentSelectedCell.row, this.currentSelectedCell.col);
+        const currentText = this.grid['pointerCell'].bindTo(this.currentEditingCell.row, this.currentEditingCell.col).value;
         this.editor.value = currentText;
         this.editor.style.left = `${cellTarget.x + this.container.scrollLeft}px`;
         this.editor.style.top = `${cellTarget.y + this.container.scrollTop}px`;
