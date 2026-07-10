@@ -1,3 +1,4 @@
+import { CellRange, CopyPaste } from './cell.js';
 import {Grid} from './grid.js';
 import { Column, Row } from './rowcolumn.js';
 import { MAX_COLUMNS, MAX_ROWS } from './script.js';
@@ -15,6 +16,7 @@ export class GridApplication {
     private activeResizeIndex = -1;
     private initialMousePos = 0;
     private initialSize = 0;
+    private copyObject: any;
     private currentEditingCell: { row: number; col: number } | null = null;
     private currentSelectedCell: { row:number; col: number } | null = null;
 
@@ -28,7 +30,6 @@ export class GridApplication {
         this.initCanvasSizing();
         this.updateScrollDimensions();
         this.initListeners();
-
         this.grid.render();
     }
 
@@ -176,6 +177,7 @@ export class GridApplication {
             if (this.currentEditingCell) this.commitEditingChanges();
             const target = this.getCellAtPixels(mouseX, mouseY);
             this.grid.selection.selectCell(target.row, target.col);
+            this.currentSelectedCell = { row: target.row, col: target.col };
             this.grid.render();
         }
     };
@@ -206,6 +208,7 @@ export class GridApplication {
         if (this.isDraggingSelection) {
             const target = this.getCellAtPixels(mouseX, mouseY);
             this.grid.selection.updateDragRange(target.row, target.col);
+            this.currentSelectedCell = {row: target.row, col: target.col}
             this.grid.render();
             return;
         }
@@ -246,6 +249,7 @@ export class GridApplication {
         const mouseY = e.clientY - rect.top;
         const cellTarget = this.getCellAtPixels(mouseX, mouseY);
         this.currentEditingCell = { row: cellTarget.row, col: cellTarget.col };
+        this.currentSelectedCell = { row: cellTarget.row, col: cellTarget.col };
         const currentText = this.grid['pointerCell'].bindTo(cellTarget.row, cellTarget.col).value;
         this.editor.value = currentText;
         this.editor.style.left = `${cellTarget.x + this.container.scrollLeft}px`;
@@ -282,11 +286,31 @@ export class GridApplication {
         const key = e.key.toLowerCase();
         if (e.ctrlKey && key === 'i') {
             e.preventDefault();
-            await this.grid.renderJSON();
+            if (this.currentSelectedCell) await this.grid.renderJSON(`${this.currentSelectedCell?.row},${this.currentSelectedCell?.col}`);
+            else await this.grid.renderJSON();
+            return;
+        }
+        if (e.ctrlKey && e.code == 'KeyC'){
+            e.preventDefault();
+            if (!this.grid.selection.boundedRange) return;
+            this.copyObject = new CopyPaste(this.grid.selection.boundedRange);
+            return;
+        }
+        if (e.ctrlKey && e.code == 'KeyV'){
+            e.preventDefault();
+            if (!this.currentSelectedCell || !this.copyObject) return;
+            this.copyObject.paste(this.currentSelectedCell);
+            this.grid.render();
+            return;
+        }
+        if (e.ctrlKey && e.code == 'KeyO'){
+            e.preventDefault();
+            document.getElementById('loaded-file')?.click();
             return;
         }
         if (e.ctrlKey || e.metaKey) {
-            if (key === 'z') {e.preventDefault();
+            if (key === 'z') {
+                e.preventDefault();
                 if (e.shiftKey) {
                     this.grid.redo();
                 } 
@@ -298,6 +322,7 @@ export class GridApplication {
                 e.preventDefault();
                 this.grid.redo();
             }
+            return;
         }
     };
     private handleFileChange = async (event: Event) => {
@@ -337,8 +362,6 @@ export class GridApplication {
         if (!this.currentSelectedCell) return;
         const row = this.currentSelectedCell.row;
         const col = this.currentSelectedCell.col;
-        const rowH = Row.getHeight(row);
-        const colW = Column.getWidth(col);
         const rowlast = this.grid.lastRow;
         const collast = this.grid.lastCol;
         const rowfirst = this.grid.firstRow;
@@ -348,22 +371,14 @@ export class GridApplication {
             if (col == 0){
                 this.container.scrollTop = 0;
                 this.container.scrollLeft = 0;
+                return;
             }
             else{
                 this.container.scrollTop = 0;
             }
-            return;
-        }
-        else if (col == 0){
+        } else if (col == 0){
             this.container.scrollLeft = 0;
-            return;
         }
-
-        // console.log(`Current row,column: ${row},${col}`);
-        // console.log(`First row,column: ${rowfirst},${colfirst}`);
-        // console.log(`Last row,column: ${rowlast},${collast}`);
-        // console.log(`Width row,column: ${rowH},${colW}`);
-
         let changeX = 0;
         let changeY = 0;
         if (row > rowlast){
@@ -459,4 +474,5 @@ export class GridApplication {
                 break;
         }
     }
+
 }

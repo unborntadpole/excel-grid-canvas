@@ -42,8 +42,8 @@ export class Grid {
         this.render();
     }
 
-    public async renderJSON(){
-        const cmd = new RenderJsonCommand();
+    public async renderJSON(key?:string){
+        const cmd = new RenderJsonCommand(key);
         await this.history.executeCommand(cmd);
         this.render();
     }

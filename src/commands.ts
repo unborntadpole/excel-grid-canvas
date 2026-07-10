@@ -103,14 +103,16 @@ export class ResizeRowCommand implements ICommand {
 export class RenderJsonCommand implements ICommand {
     private oldValue: Map<string, CellState> | null = null;
     private newValue: Map<string, CellState> | null = null;
+    private key?: string;
 
-    constructor() {
+    constructor(key?:string) {
+        if (key) this.key = key;
     }
 
     async execute() {
         if (!this.newValue) {
             this.oldValue = structuredClone(getSPARSECELLDATA());
-            await fetchFromJson();
+            await fetchFromJson(this.key);
             this.newValue = structuredClone(getSPARSECELLDATA());
             return;
         }
