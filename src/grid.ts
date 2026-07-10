@@ -14,6 +14,11 @@ export class Grid {
     public scrollX: number = 0;
     public scrollY: number = 0;
 
+    public lastRow = 0;
+    public lastCol = 0;
+    public firstRow = 0;
+    public firstCol = 0;
+
     constructor(private readonly canvas: HTMLCanvasElement){
         const context = this.canvas.getContext('2d');
         if (!context) {
@@ -83,15 +88,29 @@ export class Grid {
         ctx.scale(dpr, dpr);
 
         let currentY = 0;
-        for (let r = 0; r < MAX_ROWS; r++) {
+        let r = 0
+        let setInitialRow = true;
+        let setInitialCol = true;
+        let setLastRow = true;
+        let setLastCol = true;
+        for (r = 0; r < MAX_ROWS; r++) {
             const rh = Row.getHeight(r);
             if (currentY + rh >= this.scrollY && currentY <= this.scrollY + viewH){
                 let currentX = 0;
-
-                for(let c = 0; c < MAX_COLUMNS; c++){
+                let c = 0;
+                if(setInitialRow) {
+                    this.firstRow = r;
+                    setInitialRow = false;
+                }
+                for(c = 0; c < MAX_COLUMNS; c++){
                     const cw = Column.getWidth(c);
 
                     if (currentX + cw >= this.scrollX && currentX <= this.scrollX + viewW) {
+                        if (setInitialCol){
+                            this.firstCol = c;
+                            setInitialCol = false;
+                        }
+                        
                         const x = Math.floor(currentX - this.scrollX);
                         const y = Math.floor(currentY - this.scrollY);
 
@@ -120,8 +139,16 @@ export class Grid {
                             ctx.restore();
                         }
                     }
+                    else if (!setInitialCol && setLastCol){
+                        this.lastCol = c-1;
+                        setLastCol = false;
+                    }
                     currentX += cw;
                 }
+            }
+            else if (!setInitialRow && setLastRow){
+                this.lastRow = r - 1;
+                setLastRow = false;
             }
             currentY += rh;
         }

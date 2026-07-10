@@ -16,6 +16,7 @@ export class GridApplication {
     private initialMousePos = 0;
     private initialSize = 0;
     private currentEditingCell: { row: number; col: number } | null = null;
+    private currentSelectedCell: { row:number; col: number } | null = null;
 
     constructor() {
         this.container = document.getElementById('grid-container') as HTMLDivElement;
@@ -118,6 +119,9 @@ export class GridApplication {
         this.fileInput.addEventListener('change', this.handleFileChange);
         this.fileInput.addEventListener('click', this.handleFileClick);
         window.addEventListener('resize', this.handleResize);
+        window.addEventListener('keydown', this.handleArrowKeys);
+        window.addEventListener('keydown', this.handleShiftDown);
+        window.addEventListener('keyup', this.handleShiftUp);
     }
 
 
@@ -133,6 +137,9 @@ export class GridApplication {
         this.fileInput.removeEventListener('change', this.handleFileChange);
         this.fileInput.removeEventListener('click', this.handleFileClick);
         window.removeEventListener('resize', this.handleResize);
+        window.removeEventListener('keydown', this.handleArrowKeys);
+        window.removeEventListener('keydown', this.handleShiftDown);
+        window.removeEventListener('keyup', this.handleShiftUp);
     }
 
 
@@ -325,4 +332,131 @@ export class GridApplication {
         this.initCanvasSizing();
         this.grid.render();
     };
+
+    private repositionGrid(): void{
+        if (!this.currentSelectedCell) return;
+        const row = this.currentSelectedCell.row;
+        const col = this.currentSelectedCell.col;
+        const rowH = Row.getHeight(row);
+        const colW = Column.getWidth(col);
+        const rowlast = this.grid.lastRow;
+        const collast = this.grid.lastCol;
+        const rowfirst = this.grid.firstRow;
+        const colfirst = this.grid.firstCol;
+
+        if (row == 0){
+            if (col == 0){
+                this.container.scrollTop = 0;
+                this.container.scrollLeft = 0;
+            }
+            else{
+                this.container.scrollTop = 0;
+            }
+            return;
+        }
+        else if (col == 0){
+            this.container.scrollLeft = 0;
+            return;
+        }
+
+        // console.log(`Current row,column: ${row},${col}`);
+        // console.log(`First row,column: ${rowfirst},${colfirst}`);
+        // console.log(`Last row,column: ${rowlast},${collast}`);
+        // console.log(`Width row,column: ${rowH},${colW}`);
+
+        let changeX = 0;
+        let changeY = 0;
+        if (row > rowlast){
+            for(let rowT = row; rowT >= rowlast; rowT--){
+                changeY += Row.getHeight(rowT);
+            }
+        } 
+        else if ( row < rowfirst){
+            for(let rowT = row; rowT <= rowfirst; rowT++){
+                changeY -= Row.getHeight(rowT);
+            }
+        }
+        else if ( col > collast){
+            for(let colT = col; colT >= collast; colT--){
+                changeX += Column.getWidth(colT);
+            }
+        }
+        else if ( col < colfirst){
+            for(let colT = col; colT <= colfirst; colT++){
+                changeX -= Column.getWidth(colT);
+            }
+        }
+
+        this.container.scrollLeft += changeX;
+        this.container.scrollTop += changeY;
+    }
+
+
+    private setSelectedCell(row: number, column: number): void {
+        if (this.grid.selection.boundedRange === null){
+            this.grid.selection.selectCell(0,0);
+            this.container.scrollLeft = 0;
+            this.container.scrollTop = 0;
+        }
+        else{
+            if (this.isDraggingSelection){
+                this.grid.selection.updateDragRange(row,column);
+
+            }
+            else {
+                this.grid.selection.selectCell(row,column);
+            }
+        }
+        this.currentSelectedCell = {
+            row: row,
+            col: column
+        };
+        this.repositionGrid();
+        this.grid.render();
+    }
+
+    private handleShiftDown = (e: KeyboardEvent): void => {
+        if (document.activeElement === this.editor) return;
+        if (e.key.toLowerCase() === 'shift') {
+            this.isDraggingSelection = true;
+        }
+    }
+
+    private handleShiftUp = (e: KeyboardEvent): void => {
+        if (document.activeElement === this.editor) return;
+        if (e.key.toLowerCase() === 'shift') {
+            this.isDraggingSelection = false;
+        }
+    }
+
+    private handleArrowKeys = async (e: KeyboardEvent): Promise<void> => {
+        if (document.activeElement === this.editor) return;
+        const key = e.key.toLowerCase();
+        if (!this.currentSelectedCell){
+            this.currentSelectedCell = { 
+                row: this.grid.selection.activeRow, 
+                col: this.grid.selection.activeColumn
+            };
+        }
+        const row = this.currentSelectedCell.row;
+        const col = this.currentSelectedCell.col;
+        switch(key) {
+            case "arrowup":
+                e.preventDefault();
+                this.setSelectedCell(Math.max(0, row - 1), col);
+                break;
+            case "arrowdown":
+                e.preventDefault();
+                this.setSelectedCell(Math.min(MAX_ROWS, row + 1), col);
+                break;
+            case "arrowright":
+                e.preventDefault();
+                this.setSelectedCell(row, Math.min(col + 1, MAX_COLUMNS));
+                break;
+            case "arrowleft":
+                e.preventDefault();
+                this.setSelectedCell(row, Math.max(0, col -1));
+                break;
+        }
+    }
 }
