@@ -181,7 +181,7 @@ export class Grid {
                 ctx.strokeStyle = '#e2e8f0';
                 ctx.strokeRect(x, y, cw, HEADER_HEIGHT);
 
-                const label = String.fromCharCode(65 + c); 
+                const label = colIndexToAlphabet(c); 
                 ctx.fillStyle = '#475569';
                 ctx.font = 'bold 12px sans-serif';
                 ctx.textAlign = 'center';
@@ -196,4 +196,16 @@ export class Grid {
         ctx.strokeRect(0, 0, HEADER_WIDTH, HEADER_HEIGHT);
     }
 
+}
+
+function colIndexToAlphabet(index: number): string {
+  let result = '';
+  
+  while (index >= 0) {
+    const remainder = index % 26;
+    result = String.fromCharCode(65 + remainder) + result;
+    index = Math.floor(index / 26) - 1;
+  }
+  
+  return result;
 }
