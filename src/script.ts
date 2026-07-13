@@ -1,6 +1,3 @@
-import { Grid } from "./grid.js";
-import { Row, Column } from "./rowcolumn.js";
-
 import { GridApplication } from './eventHandler.js';
 
 export const DEFAULT_ROW_HEIGHT = 30;

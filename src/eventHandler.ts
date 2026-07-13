@@ -166,6 +166,15 @@ export class GridApplication {
         return { type: null, index: -1 };
     }
 
+    private setSelectionEvaluation(): void {
+        const evaluation = this.grid.selection.evaluate();
+        document.getElementById("field-count")!.textContent = evaluation.count!;
+        document.getElementById("field-min")!.textContent = evaluation.min!;
+        document.getElementById("field-max")!.textContent = evaluation.max!;
+        document.getElementById("field-average")!.textContent = evaluation.average!;
+        document.getElementById("field-sum")!.textContent = evaluation.sum!;
+    }
+
     private initListeners(): void {
         this.container.addEventListener('scroll', this.handleScroll);
         this.canvas.addEventListener('mousedown', this.handleMouseDown);
@@ -278,7 +287,6 @@ export class GridApplication {
         if (this.isDraggingSelection) {
             const target = this.getCellAtPixels(mouseX, mouseY);
             this.grid.selection.updateDragRange(target.row, target.col);
-            // this.currentSelectedCell = {row: target.row, col: target.col};
             this.grid.render();
             return;
         }
@@ -301,12 +309,7 @@ export class GridApplication {
         }
 
         if (this.isDraggingSelection) {
-            const evaluation = this.grid.selection.evaluate();
-            document.getElementById("field-count")!.textContent = evaluation.count!;
-            document.getElementById("field-min")!.textContent = evaluation.min!;
-            document.getElementById("field-max")!.textContent = evaluation.max!;
-            document.getElementById("field-average")!.textContent = evaluation.average!;
-            document.getElementById("field-sum")!.textContent = evaluation.sum!;
+            this.setSelectionEvaluation();
         }
         this.isDraggingSelection = false;
         this.isResizingColumn = false;
@@ -315,9 +318,6 @@ export class GridApplication {
     };
     private handleDblClick = (e: MouseEvent): void => {
         const rect = this.canvas.getBoundingClientRect();
-        // const mouseX = e.clientX - rect.left;
-        // const mouseY = e.clientY - rect.top;
-        // const cellTarget = this.getCellAtPixels(mouseX, mouseY);
         if (!this.currentSelectedCell) return;
         this.currentEditingCell = {row:this.currentSelectedCell.row, col:this.currentSelectedCell.col};
 
@@ -497,6 +497,7 @@ export class GridApplication {
             row: row,
             col: column
         };
+        this.setSelectionEvaluation();
         this.repositionGrid();
         this.grid.render();
     }
