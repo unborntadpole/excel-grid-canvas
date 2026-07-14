@@ -11,6 +11,8 @@ export class Grid {
 
     private readonly pointerCell: Cell = new Cell();
 
+    private boundedRangeLimits: Record<string,number> | null = null;
+
     public scrollX: number = 0;
     public scrollY: number = 0;
 
@@ -76,11 +78,29 @@ export class Grid {
         this.render();
     }
 
+    private resetRangeLimits(): void {
+        this.boundedRangeLimits = null;
+    }
+
+    private addToRangeLimits (x:number,y:number,cw:number,rh:number):void {
+        if (!this.boundedRangeLimits) this.boundedRangeLimits = {x:x, y:y, initX: x, initY: y, cw:cw, rh:rh};
+        if (x > this.boundedRangeLimits.x!) {
+            this.boundedRangeLimits.cw! += cw;
+            this.boundedRangeLimits.x = x;
+        }
+        if (y > this.boundedRangeLimits.y!) {
+            this.boundedRangeLimits.rh! += rh;
+            this,this.boundedRangeLimits.y = y;
+        }
+    }
+
     public render(): void {
         const ctx = this.ctx;
         const dpr = window.devicePixelRatio || 1;
         const viewW = this.canvas.width / dpr;
         const viewH = this.canvas.height / dpr;
+
+        this.resetRangeLimits();
 
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -116,6 +136,7 @@ export class Grid {
                         const y = Math.floor(currentY - this.scrollY);
 
                         if (this.selection.boundedRange && this.selection.boundedRange.contains(r, c)) {
+                            this.addToRangeLimits(x,y,cw,rh);
                             ctx.fillStyle = 'rgba(33, 115, 70, 0.08)';
                             ctx.fillRect(x, y, cw, rh);
                         }
@@ -194,6 +215,16 @@ export class Grid {
         ctx.fillRect(0, 0, HEADER_WIDTH, HEADER_HEIGHT);
         ctx.strokeStyle = '#e2e8f0';
         ctx.strokeRect(0, 0, HEADER_WIDTH, HEADER_HEIGHT);
+        if (this.selection.boundedRange){
+            ctx.fillStyle = 'rgba(33, 115, 70, 0.08)';
+            const x = this.boundedRangeLimits!.initX!;
+            const y = this.boundedRangeLimits!.initY!;
+            const w = this.boundedRangeLimits!.cw!;
+            const h = this.boundedRangeLimits!.rh!;
+            ctx.fillRect(x, 0, w, HEADER_HEIGHT);
+            ctx.fillRect(0, y, HEADER_WIDTH, h);
+
+        }
     }
 
 }
