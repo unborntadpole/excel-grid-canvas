@@ -166,6 +166,22 @@ export class GridApplication {
         return { type: null, index: -1 };
     }
 
+    private startEditing(): void {
+        if (!this.currentSelectedCell) return;
+        this.currentEditingCell = {row:this.currentSelectedCell.row, col:this.currentSelectedCell.col};
+
+        const cellTarget = this.getCellPosition(this.currentSelectedCell.row, this.currentSelectedCell.col);
+        const currentText = this.grid['pointerCell'].bindTo(this.currentEditingCell.row, this.currentEditingCell.col).value;
+
+        this.editor.value = currentText;
+        this.editor.style.left = `${cellTarget.x - this.container.scrollLeft}px`;
+        this.editor.style.top = `${cellTarget.y - this.container.scrollTop}px`;
+        this.editor.style.width = `${cellTarget.w}px`;
+        this.editor.style.height = `${cellTarget.h}px`;
+        this.editor.style.display = 'block';
+        setTimeout(() => this.editor.focus(), 10);
+    }
+
     private setSelectionEvaluation(): void {
         const evaluation = this.grid.selection.evaluate();
         document.getElementById("field-count")!.textContent = evaluation.count!;
@@ -256,7 +272,6 @@ export class GridApplication {
             if (this.currentEditingCell) this.commitEditingChanges();
             const target = this.getCellAtPixels(mouseX, mouseY);
             this.grid.selection.selectCell(target.row, target.col);
-            // this.currentSelectedCell = { row: target.row, col: target.col };
             this.grid.render();
         }
     };
@@ -317,19 +332,7 @@ export class GridApplication {
         this.activeResizeIndex = -1;
     };
     private handleDblClick = (e: MouseEvent): void => {
-        const rect = this.canvas.getBoundingClientRect();
-        if (!this.currentSelectedCell) return;
-        this.currentEditingCell = {row:this.currentSelectedCell.row, col:this.currentSelectedCell.col};
-
-        const cellTarget = this.getCellPosition(this.currentSelectedCell.row, this.currentSelectedCell.col);
-        const currentText = this.grid['pointerCell'].bindTo(this.currentEditingCell.row, this.currentEditingCell.col).value;
-        this.editor.value = currentText;
-        this.editor.style.left = `${cellTarget.x + this.container.scrollLeft}px`;
-        this.editor.style.top = `${cellTarget.y + this.container.scrollTop}px`;
-        this.editor.style.width = `${cellTarget.w}px`;
-        this.editor.style.height = `${cellTarget.h}px`;
-        this.editor.style.display = 'block';
-        setTimeout(() => this.editor.focus(), 10);
+        this.startEditing();
     };
     
     private commitEditingChanges(): void {
@@ -360,6 +363,10 @@ export class GridApplication {
             e.preventDefault();
             await this.grid.renderJSON();
             return;
+        }
+        if (e.key === "Enter") {
+            e.preventDefault();
+            this.startEditing();
         }
         if (e.ctrlKey && e.code == 'KeyC'){
             e.preventDefault();
