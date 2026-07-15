@@ -1,4 +1,4 @@
-import { DEFAULT_COLUMN_WIDTH, DEFAULT_ROW_HEIGHT } from "./script.js";
+import { DEFAULT_COLUMN_WIDTH, DEFAULT_ROW_HEIGHT } from "./config/constants.js";
 
 const GLOBAL_COL_WIDTHS = new Map<number, number>();
 const GLOBAL_ROW_HEIGHTS = new Map<number, number>();

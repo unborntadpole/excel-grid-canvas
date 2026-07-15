@@ -1,20 +1,13 @@
-import { MAX_ROWS, MAX_COLUMNS, HEADER_WIDTH, HEADER_HEIGHT } from "./script.js";
-import { Row, Column } from "./rowcolumn.js";
 import { HistoryManager, TypeActionCommand, ResizeColumnCommand, ResizeRowCommand, RenderJsonCommand, RenderJsonFromFileCommand } from "./commands.js";
 import { Cell, Selection } from "./cell.js";
-import { checkFormula } from "./formulae.js";
+import { GridRenderer } from "./gridRenderer.js";
 
 export class Grid {
     private readonly ctx: CanvasRenderingContext2D;
     public readonly selection: Selection = new Selection();
     private readonly history: HistoryManager = new HistoryManager();
-
-    private readonly pointerCell: Cell = new Cell();
-
-    private boundedRangeLimits: Record<string,number> | null = null;
-
-    public scrollX: number = 0;
-    public scrollY: number = 0;
+    public renderer: GridRenderer;
+    public pointerCell = new Cell();
 
     public lastRow = 0;
     public lastCol = 0;
@@ -27,6 +20,7 @@ export class Grid {
             throw new Error('Grid initialization: Failed to capture 2D context from given canvas element.')
         }
         this.ctx = context;
+        this.renderer = new GridRenderer(this.ctx, this.selection, this.canvas);
         this.initDOM();
     }
 
@@ -45,9 +39,17 @@ export class Grid {
     }
 
     public async renderJSON(){
+        const uid = crypto.randomUUID().toString();
+        performance.mark(`load-json-start-${uid}`);
         const cmd = new RenderJsonCommand(`${this.selection.activeRow},${this.selection.activeColumn}`);
         await this.history.executeCommand(cmd);
+        performance.mark(`load-json-end-${uid}`);
         this.render();
+        performance.measure(`JSON file Load Time ${uid}`, `load-json-start-${uid}`, `load-json-end-${uid}`);
+        console.log(`JSON took ${performance.getEntriesByName(`JSON file Load Time ${uid}`)[0]!.duration.toFixed(2)}ms to load.`);
+        performance.clearMarks(`load-json-start-${uid}`);
+        performance.clearMarks(`load-json-end-${uid}`);
+        performance.clearMeasures(`JSON file Load Time ${uid}`);
     }
 
     public async renderJSONFromFile(data: unknown){
@@ -78,165 +80,21 @@ export class Grid {
         this.render();
     }
 
-    private resetRangeLimits(): void {
-        this.boundedRangeLimits = null;
+    public set scrollX(x: number){
+        this.renderer.setScrollX = x;
+    }
+    public set scrollY(y: number){
+        this.renderer.setScrollY = y;
+    }    
+    public get scrollX(){
+        return this.renderer.setScrollX;
+    }
+    public get scrollY(){
+        return this.renderer.setScrollY;
     }
 
-    private addToRangeLimits (x:number,y:number,cw:number,rh:number):void {
-        if (!this.boundedRangeLimits) this.boundedRangeLimits = {x:x, y:y, initX: x, initY: y, cw:cw, rh:rh};
-        if (x > this.boundedRangeLimits.x!) {
-            this.boundedRangeLimits.cw! += cw;
-            this.boundedRangeLimits.x = x;
-        }
-        if (y > this.boundedRangeLimits.y!) {
-            this.boundedRangeLimits.rh! += rh;
-            this,this.boundedRangeLimits.y = y;
-        }
+    public render(){
+        this.renderer.render();
     }
 
-    public render(): void {
-        const ctx = this.ctx;
-        const dpr = window.devicePixelRatio || 1;
-        const viewW = this.canvas.width / dpr;
-        const viewH = this.canvas.height / dpr;
-
-        this.resetRangeLimits();
-
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        ctx.scale(dpr, dpr);
-
-        let setInitialRow = true;
-        let setInitialCol = true;
-        let setLastRow = true;
-        let setLastCol = true;
-
-        let currentY = HEADER_HEIGHT;
-        let r = 0;
-        for (r = 0; r < MAX_ROWS; r++) {
-            const rh = Row.getHeight(r);
-            
-            if (currentY + rh >= this.scrollY && currentY <= this.scrollY + viewH) {
-                if (setInitialRow) {
-                    this.firstRow = r;
-                    setInitialRow = false;
-                }
-
-                let currentXLoop = HEADER_WIDTH;
-                let c = 0
-                for (c = 0; c < MAX_COLUMNS; c++) {
-                    const cw = Column.getWidth(c);
-
-                    if (currentXLoop + cw >= this.scrollX && currentXLoop <= this.scrollX + viewW) {
-                        if (setInitialCol) {
-                            this.firstCol = c;
-                            setInitialCol = false;
-                        }
-                        const x = Math.floor(currentXLoop - this.scrollX);
-                        const y = Math.floor(currentY - this.scrollY);
-
-                        if (this.selection.boundedRange && this.selection.boundedRange.contains(r, c)) {
-                            this.addToRangeLimits(x,y,cw,rh);
-                            ctx.fillStyle = 'rgba(33, 115, 70, 0.08)';
-                            ctx.fillRect(x, y, cw, rh);
-                        }
-
-                        ctx.strokeStyle = '#e2e8f0';
-                        ctx.lineWidth = 1;
-                        ctx.strokeRect(x, y, cw, rh);
-
-
-                        const cell = this.pointerCell.bindTo(r,c);
-                        if (cell.value){
-                            let value = checkFormula(cell.value)
-                            ctx.fillStyle = '#1e293b';
-                            ctx.font = '13px Segoe UI, -apple-system, BlinkMacSystemFont, sans-serif';
-                            ctx.textBaseline = 'middle';
-
-                            ctx.save();
-                            ctx.beginPath();
-                            ctx.rect(x + 4, y, cw - 4, rh);
-                            ctx.clip(); 
-
-                            ctx.fillText(value || cell.value, x + cw/2, y + rh / 2);
-                            ctx.restore();
-                        }
-                        
-                    } else if (!setInitialCol && setLastCol){
-                        this.lastCol = c;
-                        setLastCol = false;
-                    }
-                    currentXLoop += cw;
-                }
-                                const rowX = 0;
-                const rowY = Math.floor(currentY - this.scrollY);
-                
-                ctx.fillStyle = '#f8fafc';
-                ctx.fillRect(rowX, rowY, HEADER_WIDTH, rh);
-                ctx.strokeStyle = '#e2e8f0';
-                ctx.strokeRect(rowX, rowY, HEADER_WIDTH, rh);
-
-                ctx.fillStyle = '#475569';
-                ctx.font = 'bold 12px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText((r + 1).toString(), rowX + HEADER_WIDTH / 2, rowY + rh / 2);
-
-            } else if (!setInitialRow && setLastRow){
-                this.lastRow = r;
-                setLastRow = false;
-            }
-            currentY += rh;
-        }
-        let currentX = HEADER_WIDTH;
-        for (let c = 0; c < MAX_COLUMNS; c++) {
-            const cw = Column.getWidth(c);
-            if (currentX + cw >= this.scrollX && currentX <= this.scrollX + viewW) {
-
-
-                const x = Math.floor(currentX - this.scrollX);
-                const y = 0;
-
-                ctx.fillStyle = '#f8fafc';
-                ctx.fillRect(x, y, cw, HEADER_HEIGHT);
-                ctx.strokeStyle = '#e2e8f0';
-                ctx.strokeRect(x, y, cw, HEADER_HEIGHT);
-
-                const label = colIndexToAlphabet(c); 
-                ctx.fillStyle = '#475569';
-                ctx.font = 'bold 12px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(label, x + cw / 2, y + HEADER_HEIGHT / 2);
-            }
-            currentX += cw;
-        }
-        ctx.fillStyle = '#f8fafc';
-        ctx.fillRect(0, 0, HEADER_WIDTH, HEADER_HEIGHT);
-        ctx.strokeStyle = '#e2e8f0';
-        ctx.strokeRect(0, 0, HEADER_WIDTH, HEADER_HEIGHT);
-        if (this.selection.boundedRange){
-            ctx.fillStyle = 'rgba(33, 115, 70, 0.08)';
-            const x = this.boundedRangeLimits!.initX!;
-            const y = this.boundedRangeLimits!.initY!;
-            const w = this.boundedRangeLimits!.cw!;
-            const h = this.boundedRangeLimits!.rh!;
-            ctx.fillRect(x, 0, w, HEADER_HEIGHT);
-            ctx.fillRect(0, y, HEADER_WIDTH, h);
-
-        }
-    }
-
-}
-
-function colIndexToAlphabet(index: number): string {
-  let result = '';
-  
-  while (index >= 0) {
-    const remainder = index % 26;
-    result = String.fromCharCode(65 + remainder) + result;
-    index = Math.floor(index / 26) - 1;
-  }
-  
-  return result;
 }

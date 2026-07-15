@@ -1,7 +1,7 @@
 import { CellRange, CopyPaste } from './cell.js';
 import {Grid} from './grid.js';
 import { Column, Row } from './rowcolumn.js';
-import { DEFAULT_COLUMN_WIDTH, DEFAULT_ROW_HEIGHT, HEADER_HEIGHT, HEADER_WIDTH, MAX_COLUMNS, MAX_ROWS, RESIZE_THRESHOLD } from './script.js';
+import { DEFAULT_COLUMN_WIDTH, DEFAULT_ROW_HEIGHT, HEADER_HEIGHT, HEADER_WIDTH, MAX_COLUMNS, MAX_ROWS, RESIZE_THRESHOLD } from './config/constants.js';
 
 export class GridApplication {
     private container: HTMLDivElement;
@@ -13,6 +13,7 @@ export class GridApplication {
     private isDraggingSelection = false;
     private isResizingColumn = false;
     private isResizingRow = false;
+    private selectedRange: CellRange | null = null;
     private activeResizeIndex = -1;
     private initialMousePos = 0;
     private initialSize = 0;
@@ -26,11 +27,17 @@ export class GridApplication {
         this.canvas = document.getElementById('my-grid-canvas') as HTMLCanvasElement;
         this.editor = document.getElementById('grid-editor') as HTMLInputElement;
         this.fileInput = document.getElementById('loaded-file') as HTMLInputElement;
+        performance.mark('grid-init-start');
         this.grid = new Grid(this.canvas);
         this.initCanvasSizing();
         this.updateScrollDimensions();
         this.initListeners();
         this.grid.render();
+        performance.mark('grid-init-end');
+        performance.measure('Grid Initial Load Time', 'grid-init-start', 'grid-init-end');
+        console.log(`Grid took ${performance.getEntriesByName('Grid Initial Load Time')[0]!.duration.toFixed(2)}ms to become interactive.`);
+        performance.clearMarks();
+        performance.clearMeasures();
     }
 
     private initCanvasSizing(): void {    
@@ -171,7 +178,7 @@ export class GridApplication {
         this.currentEditingCell = {row:this.currentSelectedCell.row, col:this.currentSelectedCell.col};
 
         const cellTarget = this.getCellPosition(this.currentSelectedCell.row, this.currentSelectedCell.col);
-        const currentText = this.grid['pointerCell'].bindTo(this.currentEditingCell.row, this.currentEditingCell.col).value;
+        const currentText = this.grid.pointerCell.bindTo(this.currentEditingCell.row, this.currentEditingCell.col).value;
 
         this.editor.value = currentText;
         this.editor.style.left = `${cellTarget.x - this.container.scrollLeft}px`;
@@ -183,7 +190,14 @@ export class GridApplication {
     }
 
     private setSelectionEvaluation(): void {
+        if (
+            this.selectedRange !== null 
+            && this.grid.selection.boundedRange 
+            && this.grid.selection.boundedRange.isSame(this.selectedRange)
+        ) return;
+        this.selectedRange = this.grid.selection.boundedRange;
         const evaluation = this.grid.selection.evaluate();
+        console.log('i got evaluated hehe');
         document.getElementById("field-count")!.textContent = evaluation.count!;
         document.getElementById("field-min")!.textContent = evaluation.min!;
         document.getElementById("field-max")!.textContent = evaluation.max!;
@@ -248,10 +262,12 @@ export class GridApplication {
         const headerHit = this.checkIfHeader(mouseX, mouseY);
         if (headerHit.type === 'col') {
             this.grid.selection.boundedRange = new CellRange(0, headerHit.index, MAX_ROWS, headerHit.index);
+            this.setSelectionEvaluation();
             this.grid.render();
             return;
         } else if (headerHit.type === 'row') {
             this.grid.selection.boundedRange = new CellRange(headerHit.index, 0, headerHit.index, MAX_COLUMNS);
+            this.setSelectionEvaluation();
             this.grid.render();
             return;
         }
@@ -272,6 +288,7 @@ export class GridApplication {
             if (this.currentEditingCell) this.commitEditingChanges();
             const target = this.getCellAtPixels(mouseX, mouseY);
             this.grid.selection.selectCell(target.row, target.col);
+            this.setSelectionEvaluation();
             this.grid.render();
         }
     };
@@ -302,6 +319,7 @@ export class GridApplication {
         if (this.isDraggingSelection) {
             const target = this.getCellAtPixels(mouseX, mouseY);
             this.grid.selection.updateDragRange(target.row, target.col);
+            this.setSelectionEvaluation();
             this.grid.render();
             return;
         }
@@ -440,10 +458,11 @@ export class GridApplication {
         if (!this.currentSelectedCell) return;
         const row = this.currentSelectedCell.row;
         const col = this.currentSelectedCell.col;
-        const rowlast = this.grid.lastRow;
-        const collast = this.grid.lastCol;
-        const rowfirst = this.grid.firstRow;
-        const colfirst = this.grid.firstCol;
+        const gridFirstLastCells = this.grid.renderer.gridFirstLastCells;
+        const rowlast = gridFirstLastCells.lr!;
+        const collast = gridFirstLastCells.lc!;
+        const rowfirst = gridFirstLastCells.fr!;
+        const colfirst = gridFirstLastCells.fc!;
 
         if (row == 0){
             if (col == 0){

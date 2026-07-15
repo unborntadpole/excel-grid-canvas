@@ -1,4 +1,4 @@
-import { MAX_COLUMNS, MAX_ROWS } from "./script.js";
+import { MAX_COLUMNS, MAX_ROWS } from "./config/constants.js";
 import { getEvaluation } from "./selectionFunctions.js";
 
 export interface CellState {
@@ -110,6 +110,17 @@ export class CellRange {
             && row <= this.endRow
             && col >= this.startCol
             && col <= this.endCol;
+    }
+    public isSame(cellrange: CellRange): boolean{
+        if (
+            this.startRow == cellrange.startRow
+            && this.endRow == cellrange.endRow
+            && this.startCol == cellrange.startCol
+            && this.endCol == cellrange.endCol
+        ){
+            return true;
+        }
+        return false;
     }
 }
 
