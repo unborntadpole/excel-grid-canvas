@@ -1,15 +1,7 @@
 import { generateData } from "./generator.js";
-import { Cell } from "./cell.js";
+import { Cell } from "../cell.js";
 
 export var dataStore: Record<string,unknown>;
-
-interface User {
-    id: number;
-    firstName: string;
-    lastName: string;
-    age: number;
-    salary: number;
-}
 
 export const fetchFromJson = async (key?:string) => {
     try{

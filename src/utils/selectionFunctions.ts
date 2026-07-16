@@ -1,5 +1,4 @@
-import { Cell, CellRange, Selection } from "./cell.js";
-import { mean, parseCellData, sum } from "./formulae.js";
+import { Cell, CellRange } from "../cell.js";
 
 
 function getCellValues(bRng:CellRange): number[] {
@@ -40,4 +39,17 @@ export function getEvaluation(bRng:CellRange): Record<string,string>{
         "average": average,
         "sum": sumString
     }
+}
+
+
+function sum(cells:number[]): number{
+    let total = 0;
+    for (const num of cells){
+        total += num
+    }
+    return total;
+}
+
+function mean(cells:number[]): number {
+    return sum(cells)/cells.length;
 }

@@ -1,4 +1,4 @@
-import { Cell } from "./cell.js";
+import { Cell } from "../cell.js";
 
 export function checkFormula(value:string): string{
     value= value.trim();

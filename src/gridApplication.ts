@@ -1,7 +1,8 @@
-import { CellRange, CopyPaste } from './cell.js';
+import { CellRange } from './cell.js';
 import {Grid} from './grid.js';
-import { Column, Row } from './rowcolumn.js';
+import { Column, Row } from './utils/rowcolumn.js';
 import { DEFAULT_COLUMN_WIDTH, DEFAULT_ROW_HEIGHT, HEADER_HEIGHT, HEADER_WIDTH, MAX_COLUMNS, MAX_ROWS, RESIZE_THRESHOLD } from './config/constants.js';
+import { CopyPaste } from './utils/copypaste.js';
 
 export class GridApplication {
     private container: HTMLDivElement;
@@ -17,7 +18,7 @@ export class GridApplication {
     private activeResizeIndex = -1;
     private initialMousePos = 0;
     private initialSize = 0;
-    private copyObject: any;
+    private copyObject: CopyPaste | null = null;
     private currentEditingCell: { row: number; col: number } | null = null;
     private currentSelectedCell: { row:number; col: number } | null = null;
 
@@ -395,7 +396,7 @@ export class GridApplication {
         if (e.ctrlKey && e.code == 'KeyV'){
             e.preventDefault();
             if (!this.currentSelectedCell || !this.copyObject) return;
-            this.copyObject.paste(this.currentSelectedCell);
+            this.grid.paste(this.copyObject, this.currentSelectedCell.row, this.currentSelectedCell.col);
             this.grid.render();
             return;
         }

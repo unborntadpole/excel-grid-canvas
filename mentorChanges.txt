@@ -1,2 +1,3 @@
 use pointer down instead of mouse down
 refactor event handler into subclasses
+convert formulae to classes and implementation

@@ -1,6 +1,11 @@
-import { HistoryManager, TypeActionCommand, ResizeColumnCommand, ResizeRowCommand, RenderJsonCommand, RenderJsonFromFileCommand } from "./commands.js";
+import { HistoryManager } from "./commands/commands.js";
 import { Cell, Selection } from "./cell.js";
 import { GridRenderer } from "./gridRenderer.js";
+import { ResizeColumnCommand, ResizeRowCommand } from "./commands/rowcolumnResize.js";
+import { RenderJsonCommand, RenderJsonFromFileCommand } from "./commands/renderjson.js";
+import { TypeActionCommand } from "./commands/typeaction.js";
+import type { CopyPaste } from "./utils/copypaste.js";
+import { PasteCommand } from "./commands/paste.js";
 
 export class Grid {
     private readonly ctx: CanvasRenderingContext2D;
@@ -66,6 +71,12 @@ export class Grid {
 
     public resizeRow(rowNumber: number, height: number): void {
         const cmd = new ResizeRowCommand(rowNumber, height);
+        this.history.executeCommand(cmd);
+        this.render();
+    }
+
+    public paste(copyObject: CopyPaste, row: number, col: number){
+        const cmd = new PasteCommand(copyObject, row, col);
         this.history.executeCommand(cmd);
         this.render();
     }

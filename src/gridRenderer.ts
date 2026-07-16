@@ -1,7 +1,7 @@
 import { Cell, Selection } from "./cell.js";
 import { HEADER_HEIGHT, HEADER_WIDTH, MAX_COLUMNS, MAX_ROWS } from "./config/constants.js";
-import { checkFormula } from "./formulae.js";
-import { Column, Row } from "./rowcolumn.js";
+import { checkFormula } from "./utils/formulae.js";
+import { Column, Row } from "./utils/rowcolumn.js";
 
 export class GridRenderer {
     private readonly ctx: CanvasRenderingContext2D;
