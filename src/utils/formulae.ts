@@ -4,8 +4,6 @@ export function checkFormula(value:string): string{
     value= value.trim();
     if (value[0] == '='){
         const operation = value.slice(1,4);
-        // console.log(operation);
-        // console.log(value);
         if (value === null) return "";
         const match = value.match(/\(([^)]+)\)/);
         if (match === null || match[1] === undefined) return "INVALID FORMULA";

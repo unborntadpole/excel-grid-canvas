@@ -1,5 +1,4 @@
-import { Cell, CellRange } from "../cell.js";
-
+import { Cell, type CellRange } from "../cell.js";
 
 function getCellValues(bRng:CellRange): number[] {
     const pointerCell = new Cell();

@@ -1,4 +1,4 @@
-import { DataStore } from './datastore.js';
+import type { DataStore } from './datastore.js';
 import { GridApplication } from './gridApplication.js';
 
 declare global {
@@ -8,14 +8,15 @@ declare global {
     }
 }
 
-if (window.__datastore) {
-    //
-} else {
-    window.__datastore = new DataStore();
+
+function initializeGrid() {
+    if (window.__gridAppInstance) {
+        window.__gridAppInstance.destroy();
+    } else {
+        window.__gridAppInstance = new GridApplication();
+    }
 }
 
-if (window.__gridAppInstance) {
-    window.__gridAppInstance.destroy();
-} else {
-    window.__gridAppInstance = new GridApplication();
+if (typeof document !== 'undefined' && document.getElementById('my-grid-canvas')) {
+    initializeGrid();
 }

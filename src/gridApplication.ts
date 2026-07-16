@@ -3,6 +3,7 @@ import {Grid} from './grid.js';
 import { Column, Row } from './utils/rowcolumn.js';
 import { DEFAULT_COLUMN_WIDTH, DEFAULT_ROW_HEIGHT, HEADER_HEIGHT, HEADER_WIDTH, MAX_COLUMNS, MAX_ROWS, RESIZE_THRESHOLD } from './config/constants.js';
 import { CopyPaste } from './utils/copypaste.js';
+import { DataStore } from './datastore.js';
 
 export class GridApplication {
     private container: HTMLDivElement;
@@ -11,6 +12,7 @@ export class GridApplication {
     private editor: HTMLInputElement;
     private fileInput: HTMLInputElement;
     public grid: Grid;
+    private datastore = new DataStore();
     private isDraggingSelection = false;
     private isResizingColumn = false;
     private isResizingRow = false;
@@ -23,6 +25,7 @@ export class GridApplication {
     private currentSelectedCell: { row:number; col: number } | null = null;
 
     constructor() {
+        window.__datastore = this.datastore;
         this.container = document.getElementById('grid-container') as HTMLDivElement;
         this.spacer = document.getElementById('grid-spacer') as HTMLDivElement;
         this.canvas = document.getElementById('my-grid-canvas') as HTMLCanvasElement;
