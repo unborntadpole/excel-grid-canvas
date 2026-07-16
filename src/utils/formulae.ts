@@ -23,7 +23,7 @@ export function checkFormula(value:string): string{
             case "med":
                 return ""+ median(cellValues[0]);
             case "avg":
-                return ""+ mean(cellValues[0]);
+                return ""+ mean(cellValues[0]).toFixed(2);
         }
         return "INVALID FORMULA";
     }

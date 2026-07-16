@@ -1,3 +1,4 @@
+import { MAX_COLUMNS, MAX_ROWS } from "./config/constants.js";
 import { getEvaluation } from "./utils/selectionFunctions.js";
 
 export class Cell {
@@ -11,6 +12,7 @@ export class Cell {
     }
 
     public get key(): string {
+        if (this.row >= MAX_ROWS || this.column >= MAX_COLUMNS) return "INVALID";
         return `${this.row},${this.column}`;
     }
 
@@ -79,7 +81,13 @@ export class Selection {
     }
 
     public evaluate(): Record<string, string>{
-        if (this.boundedRange === null) return {};
+        if (this.boundedRange === null) return {
+            "count" : "0",
+            "min": "",
+            "max": "",
+            "average": "",
+            "sum": ""
+        };
         return getEvaluation(this.boundedRange);
     }
 }

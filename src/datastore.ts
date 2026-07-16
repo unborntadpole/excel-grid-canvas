@@ -29,10 +29,12 @@ export class DataStore {
     }
 
     public getCellData(key: string): CellState | undefined{
+        if (key === "INVALID") return undefined;
         return this.cell_data.get(key);
     }
 
     public setRawValue(key: string, val: string): void {
+        if (key === "INVALID") return;
         if (val === ''){
             this.cell_data.delete(key);
         } 

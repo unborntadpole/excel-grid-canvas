@@ -2,7 +2,7 @@ import { Cell } from "../cell.js";
 import { DataStore } from "../datastore.js";
 import { checkFormula } from "../utils/formulae.js";
 
-describe.skip('Testing formulae function', () => {
+describe('Testing formulae function', () => {
     beforeAll(async () => {
         window.__datastore = new DataStore();
         new Cell().bindTo(0,0).setRawValue("5");
@@ -32,8 +32,21 @@ describe.skip('Testing formulae function', () => {
         const formula = '=Sum(a1,a2,a3,a4,a5)';
         expect(checkFormula(formula)).toBe("16");
     });
-    it('checkFormula(), should exclude all text', () => {
+    it('checkFormula(), testing =sum()', () => {
         const formula = '=Sum(a1,a2,a3,a4,a6)';
         expect(checkFormula(formula)).toBe("16");
     });
+    it('checkFormula(), testing =median()', () => {
+        const formula = '=median(a1,a2,a3,a4,a6)';
+        expect(checkFormula(formula)).toBe("4");
+    });
+    it('checkFormula(), testing =avg()', () => {
+        const formula = '=avg(a1,a2,a3,a4,a6)';
+        expect(checkFormula(formula)).toBe("4.00");
+    });
+    it('checkFormula(), testing =mean()', () => {
+        const formula = '=mean(a1,a2,a3,a4,a6)';
+        expect(checkFormula(formula)).toBe("4.00");
+    });
+    
 });

@@ -81,7 +81,34 @@ Every user action that modifies state (editing a cell, resizing a row/column, im
 When an action occurs, it is passed to the HistoryManager, which executes it and pushes it to an undoStack. When Ctrl+Z is pressed, the manager pops the command, calls its undo() method, and pushes it to a redoStack.
  
 ## Test Cases Covered
- 
+1. Testing Cell and Selection:
+    1. cell setRawValue() and value, should store and retrieve a value in cell
+    2. cell setRawValue() and value, should return "" on exceeding limit
+    3. selection evaluate(), should get selection evaluation
+    4. selection evaluate(), should return initial empty object when there is no selection at all
+
+2. Testing cell selection functions
+    1. getEvaluation(), should evalute a cell range
+    2. getEvaluation(), should safely skip text
+    3. getEvaluation(), should not evaluate text
+
+3. Testing formulae function
+    1. checkFormula(), should evalute a formula
+    2. checkFormula(), should return "" without = in the beginning
+    3. checkFormula(), invalid formula name
+    4. checkFormula(), should exclude empty text
+    5. checkFormula(), testing =sum()
+    6. checkFormula(), testing =median()
+    7. checkFormula(), testing =avg()
+    8. checkFormula(), testing =mean()
+
+4. Testing cell copy paste functions
+    1. paste(), should paste in new location
+    2. paste(), should paste text too in new location
+    3. paste(), should overwrite text new location
+    4. paste(), should not crash on exceeding Max rows
+    5. paste(), should not paste beyond scope
+
  
 ## Performance Observations
 * Initialization: Initialization of grid takes around 10 - 20 ms and reloading window takes < 10ms.

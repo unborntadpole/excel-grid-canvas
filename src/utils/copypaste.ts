@@ -32,6 +32,7 @@ export class CopyPaste {
     public paste(selectedCell: SelectedCell): void{
         const row = selectedCell.row;
         const col = selectedCell.col;
+        if (row >= MAX_ROWS || col >= MAX_COLUMNS) return;
         this.lastrow = Math.min(row + this.rows, MAX_ROWS);
         this.lastcol = Math.min(col + this.cols, MAX_COLUMNS);
         for (let r = row; r<=this.lastrow; r++){

@@ -201,7 +201,6 @@ export class GridApplication {
         ) return;
         this.selectedRange = this.grid.selection.boundedRange;
         const evaluation = this.grid.selection.evaluate();
-        console.log('i got evaluated hehe');
         document.getElementById("field-count")!.textContent = evaluation.count!;
         document.getElementById("field-min")!.textContent = evaluation.min!;
         document.getElementById("field-max")!.textContent = evaluation.max!;
