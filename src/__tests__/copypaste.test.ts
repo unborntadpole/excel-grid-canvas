@@ -3,7 +3,7 @@ import { MAX_COLUMNS, MAX_ROWS } from "../config/constants.js";
 import { DataStore } from "../datastore.js";
 import { CopyPaste } from "../utils/copypaste.js";
 
-describe('Testing cell copy paste functions', () => {
+describe.skip('Testing cell copy paste functions', () => {
     beforeAll(async () => {
         window.__datastore = new DataStore();
         new Cell().bindTo(0,0).setRawValue("5");

@@ -1,6 +1,6 @@
 import { Cell, Selection } from "./cell.js";
 import { HEADER_HEIGHT, HEADER_WIDTH, MAX_COLUMNS, MAX_ROWS } from "./config/constants.js";
-import { checkFormula } from "./utils/formulae.js";
+import { useformula } from "./utils/formulae.js";
 import { Column, Row } from "./utils/rowcolumn.js";
 
 export class GridRenderer {
@@ -123,7 +123,7 @@ export class GridRenderer {
 
                         const cell = this.pointerCell.bindTo(r,c);
                         if (cell.value){
-                            let value = checkFormula(cell.value)
+                            let checkingformula = useformula(r,c);
                             ctx.fillStyle = '#1e293b';
                             ctx.font = '13px Segoe UI, -apple-system, BlinkMacSystemFont, sans-serif';
                             ctx.textBaseline = 'middle';
@@ -133,7 +133,7 @@ export class GridRenderer {
                             ctx.rect(x + 4, y, cw - 4, rh);
                             ctx.clip(); 
 
-                            ctx.fillText(value || cell.value, x + cw/2, y + rh / 2);
+                            ctx.fillText(checkingformula || cell.value, x + cw/2, y + rh / 2);
                             ctx.restore();
                         }
                         

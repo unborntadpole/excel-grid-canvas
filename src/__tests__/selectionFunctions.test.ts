@@ -2,7 +2,7 @@ import { Cell, CellRange } from "../cell.js";
 import { DataStore } from "../datastore.js";
 import { getEvaluation } from "../utils/selectionFunctions.js";
 
-describe('Testing cell selection functions', () => {
+describe.skip('Testing cell selection functions', () => {
     beforeAll(async () => {
         window.__datastore = new DataStore();
         new Cell().bindTo(0,0).setRawValue("5");

@@ -101,6 +101,8 @@ When an action occurs, it is passed to the HistoryManager, which executes it and
     6. checkFormula(), testing =median()
     7. checkFormula(), testing =avg()
     8. checkFormula(), testing =mean()
+    9. useFormula(), new function
+    10. Formulae calling each other
 
 4. Testing cell copy paste functions
     1. paste(), should paste in new location

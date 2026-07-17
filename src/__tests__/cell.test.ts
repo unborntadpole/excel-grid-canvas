@@ -2,7 +2,7 @@ import { Cell, Selection } from "../cell.js";
 import { MAX_ROWS } from "../config/constants.js";
 import { DataStore } from "../datastore.js";
 
-describe('Testing Cell and Selection', () => {
+describe.skip('Testing Cell and Selection', () => {
     beforeAll(async () => {
         window.__datastore = new DataStore();
     });

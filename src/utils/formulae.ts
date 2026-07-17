@@ -1,7 +1,21 @@
 import { Cell } from "../cell.js";
 
-export function checkFormula(value:string): string{
-    value= value.trim();
+export function useformula(row: number, col: number):string {
+    const pointer = new Cell();
+    const value = pointer.bindTo(row, col).value;
+    // console.log(row," ",col);
+    if(value !== '' && value.trim()[0] === '='){
+        // console.log(`setting formula cell (${row},${col}) to invalid formula`);
+        pointer.bindTo(row, col).setRawValue('#UNDEFINED');
+        const res = checkFormula(value);
+        pointer.bindTo(row, col).setRawValue(value);
+        return res;
+    }
+    else return '';
+}
+
+export function checkFormula(value: string): string{
+    value = value.trim();
     if (value[0] == '='){
         const operation = value.slice(1,4);
         if (value === null) return "";
@@ -33,13 +47,29 @@ export function checkFormula(value:string): string{
 function parseCells(cells:string[]): string[] | null{
     let cellsParsed: string[] = [];
     cells.forEach(cell => {
-        let key= excelToCoordinatesToValue(cell);
-        if (key!=null) cellsParsed.push(key);
+        // console.log(cell);
+        let cellIndex= excelToCoordinatesToRowCol(cell);
+        if (cellIndex!=null) {
+            const row: number = cellIndex.row;
+            const col: number = cellIndex.col;
+            let value = new Cell().bindTo(row,col).value;
+            // console.log('checking for formula: ', row,',',col, ' ', value);
+            const checkingformula = useformula(row,col);
+            if (checkingformula !== ''){
+                value = checkingformula;
+            }
+            cellsParsed.push(value);
+        };
     });
     return cellsParsed;
 }
 
-function excelToCoordinatesToValue(cell: string): string | null {
+interface rowcol {
+    row: number,
+    col: number
+}
+
+function excelToCoordinatesToRowCol(cell: string): rowcol | null {
     const pointerCell = new Cell();
     const cleanCell = cell.toLowerCase().trim();
 
@@ -57,17 +87,14 @@ function excelToCoordinatesToValue(cell: string): string | null {
     }
     colIndex = colIndex - 1;
 
-    return pointerCell.bindTo(rowIndex,colIndex).value;
+    return {"row": rowIndex, "col": colIndex};
 }
 
 export function parseCellData(cells:string[]): [number[], boolean]{
     let parsedValues:number[] = [];
     cells.forEach(cell => {
         const value = parseInt(cell);
-        if (Number.isNaN(value)){
-            return [[], false];
-        }
-        else parsedValues.push(value);
+        if (!Number.isNaN(value)) parsedValues.push(value);
     });
     return [parsedValues, true];
 }

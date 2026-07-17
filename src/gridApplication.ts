@@ -210,9 +210,9 @@ export class GridApplication {
 
     private initListeners(): void {
         this.container.addEventListener('scroll', this.handleScroll);
-        this.canvas.addEventListener('mousedown', this.handleMouseDown);
-        window.addEventListener('mousemove', this.handleMouseMove);
-        window.addEventListener('mouseup', this.handleMouseUp);
+        this.canvas.addEventListener('pointerdown', this.handleMouseDown);
+        window.addEventListener('pointermove', this.handleMouseMove);
+        window.addEventListener('pointerup', this.handleMouseUp);
         this.canvas.addEventListener('dblclick', this.handleDblClick);
         this.editor.addEventListener('keydown', this.handleEditorKeyDown);
         this.editor.addEventListener('blur', this.handleEditorBlur);
@@ -228,9 +228,9 @@ export class GridApplication {
 
     public destroy(): void {
         this.container.removeEventListener('scroll', this.handleScroll);
-        this.canvas.removeEventListener('mousedown', this.handleMouseDown);
-        window.removeEventListener('mousemove', this.handleMouseMove);
-        window.removeEventListener('mouseup', this.handleMouseUp);
+        this.canvas.removeEventListener('pointerdown', this.handleMouseDown);
+        window.removeEventListener('pointermove', this.handleMouseMove);
+        window.removeEventListener('pointerup', this.handleMouseUp);
         this.canvas.removeEventListener('dblclick', this.handleDblClick);
         this.editor.removeEventListener('keydown', this.handleEditorKeyDown);
         this.editor.removeEventListener('blur', this.handleEditorBlur);
