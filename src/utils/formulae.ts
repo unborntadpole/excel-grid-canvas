@@ -92,10 +92,16 @@ function excelToCoordinatesToRowCol(cell: string): rowcol | null {
 
 export function parseCellData(cells:string[]): [number[], boolean]{
     let parsedValues:number[] = [];
-    cells.forEach(cell => {
+    // cells.forEach(cell => {
+    //     const value = parseInt(cell);
+    //     if (!Number.isNaN(value)) parsedValues.push(value);
+    // });
+    for (let i = 0; i < cells.length; i ++){
+        const cell = cells[i];
+        if (cell === undefined) continue;
         const value = parseInt(cell);
         if (!Number.isNaN(value)) parsedValues.push(value);
-    });
+    }
     return [parsedValues, true];
 }
 
