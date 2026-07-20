@@ -1,19 +1,19 @@
 import { MAX_COLUMNS, MAX_ROWS } from "../config/constants.js";
 import type { Grid } from "../grid.js";
 import { Column, Row } from "../utils/rowcolumn.js";
+import type { Handler } from "./eventhandler.js";
 import type { GridState } from "./gridState.js";
 
-export class KeyboardSelection {
+export class KeyboardSelection implements Handler{
     private grid: Grid;
     private gridState : GridState;
 
     constructor(state: GridState){
         this.gridState = state;
         this.grid = this.gridState.grid;
-        this.initialize();
     }
 
-    private initialize() {
+    public initialize() {
         window.addEventListener('keydown', this.handleArrowKeys);
         window.addEventListener('keydown', this.handleShiftDown);
         window.addEventListener('keyup', this.handleShiftUp);

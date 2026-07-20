@@ -34,13 +34,17 @@ export class GridApplication {
         this.gridSelection = new GridSelection(this.state);
         this.keyboardSelection = new KeyboardSelection(this.state);
         
-        // this.initListeners();
+        this.initListeners();
         this.grid.render();
     }
 
-    // private initListeners(): void {
-
-    // }
+    private initListeners(): void {
+        this.misc.initialize();
+        this.editing.initialize();
+        this.rowcolResize.initialize();
+        this.gridSelection.initialize();
+        this.keyboardSelection.initialize();
+    }
 
 
     public destroy(): void {

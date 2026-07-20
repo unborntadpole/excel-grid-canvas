@@ -2,9 +2,10 @@
 
 import type { Grid } from "../grid.js";
 import { CopyPaste } from "../utils/copypaste.js";
+import type { Handler } from "./eventhandler.js";
 import type { GridState } from "./gridState.js";
 
-export class Misc {
+export class Misc implements Handler{
     private grid: Grid;
     private gridState : GridState;
 
@@ -12,7 +13,6 @@ export class Misc {
         this.gridState = state;
         this.grid = this.gridState.grid;
         this.initCanvasSizing();
-        this.initialize();
     }
 
     public initialize() {

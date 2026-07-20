@@ -1,19 +1,19 @@
 import { HEADER_HEIGHT, HEADER_WIDTH, MAX_COLUMNS, MAX_ROWS, RESIZE_THRESHOLD } from "../config/constants.js";
 import type { Grid } from "../grid.js";
 import { Column, Row } from "../utils/rowcolumn.js";
+import type { Handler } from "./eventhandler.js";
 import type { GridState } from "./gridState.js";
 
-export class ResizeRowCol {
+export class ResizeRowCol implements Handler{
     private grid: Grid;
     private gridState : GridState;
 
     constructor(state: GridState){
         this.gridState = state;
         this.grid = this.gridState.grid;
-        this.initialize();
     }
 
-    private initialize() {
+    public initialize() {
         this.gridState.canvas.addEventListener('pointerdown', this.handleMouseDown);
         window.addEventListener('pointermove', this.handleMouseMove);
         window.addEventListener('pointerup', this.handleMouseUp);
