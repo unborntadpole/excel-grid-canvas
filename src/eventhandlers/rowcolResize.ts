@@ -30,7 +30,7 @@ export class ResizeRowCol {
         const absoluteX = pixelX + this.grid.scrollX;
         const absoluteY = pixelY + this.grid.scrollY;
         const threshold = RESIZE_THRESHOLD;
-        // if (pixelX > HEADER_WIDTH || pixelY > HEADER_HEIGHT) return { type: null, index: -1 }
+        if (pixelX > HEADER_WIDTH && pixelY > HEADER_HEIGHT) return { type: null, index: -1 }
         let currentX = 0 + HEADER_WIDTH;
         for (let c = 0; c < MAX_COLUMNS; c++) {
             currentX += Column.getWidth(c);
