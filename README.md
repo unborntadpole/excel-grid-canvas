@@ -38,6 +38,14 @@ The objective of this project is to build a high-performance, Excel-like spreads
     - `cell.ts`: Has classes for Cell, CellRange and Selection. Cell used for accessing data, Selection used for storing selected cells.
     - `datastore.ts`: Class for storing cell data and row heights and column widths securely.
 
+- `src/eventhandlers`
+    - `gridState.ts`: Class to handle state variables.
+    - `editing.ts`: Handles the pointer and keyboard events for input.
+    - `gridSelection.ts`: Handles the pointer events for selection.
+    - `keyboardSelection.ts`: Handles the keyboard event for selection.
+    - `misc.ts`: Handles copy paste, undo redo, resize window, scroll, initial sizing of canvas.
+    - `rowcolResize.ts`: Handles resizing of row and column.
+
 - `src/utils`
     - `generator.ts`:  Backup class for data generation when json file from default import is not found.
     - `rowcolumn.ts`:  Has classes for updating values of row and column width in memory.
