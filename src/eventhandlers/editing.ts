@@ -116,7 +116,7 @@ export class Editing {
         this.gridState.editor.style.display = 'block';
         setTimeout(() => this.gridState.editor.focus(), 10);
     }
-    
+
 
     private handleMouseDown = (e: MouseEvent): void => {
         e.preventDefault(); 
@@ -150,13 +150,14 @@ export class Editing {
     }
 
     private handleKeyDown = (e: KeyboardEvent): void => {
-        if (!this.gridState.currentEditingCell && e.key === 'Enter'){
+        if (document.activeElement === this.gridState.editor) return;
+        if (e.key === 'Enter'){
             this.startEditing();
         }
     }
 
     private handleEditorKeyDown = (e: KeyboardEvent): void => {
-         if (e.key === 'Enter') {
+        if (e.key === 'Enter') {
             this.commitEditingChanges();
             this.gridState.canvas.focus();
         } 
