@@ -2,10 +2,9 @@ import { CellRange } from "../cell.js";
 import { HEADER_HEIGHT, HEADER_WIDTH, MAX_COLUMNS, MAX_ROWS, RESIZE_THRESHOLD } from "../config/constants.js";
 import type { Grid } from "../grid.js";
 import { Column, Row } from "../utils/rowcolumn.js";
-import type { Handler } from "./eventhandler.js";
 import type { GridState } from "./gridState.js";
 
-export class GridSelection implements Handler{
+export class GridSelection{
     private grid: Grid;
     private gridState : GridState;
 
@@ -168,7 +167,6 @@ export class GridSelection implements Handler{
             this.grid.selection.updateDragRange(target.row, target.col);
             this.setSelectionEvaluation();
             this.grid.render();
-            return;
         }
     };
 

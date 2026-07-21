@@ -1,10 +1,9 @@
 import { DEFAULT_COLUMN_WIDTH, DEFAULT_ROW_HEIGHT, HEADER_HEIGHT, HEADER_WIDTH, MAX_COLUMNS, MAX_ROWS, RESIZE_THRESHOLD } from "../config/constants.js";
 import type { Grid } from "../grid.js";
 import { Column, Row } from "../utils/rowcolumn.js";
-import type { Handler } from "./eventhandler.js";
 import type { GridState } from "./gridState.js";
 
-export class Editing implements Handler{
+export class Editing{
     private grid: Grid;
     private gridState : GridState;
 

@@ -5,6 +5,9 @@ import { GridSelection } from './eventhandlers/gridSelection.js';
 import { KeyboardSelection } from './eventhandlers/keyboardSelection.js';
 import { Editing } from './eventhandlers/editing.js';
 import { Misc } from './eventhandlers/misc.js';
+import { HEADER_HEIGHT, HEADER_WIDTH, MAX_COLUMNS, MAX_ROWS } from './config/constants.js';
+import { Column, Row } from './utils/rowcolumn.js';
+import { MouseController } from './eventhandlers/mouse/mouseController.js';
 
 
 export class GridApplication {
@@ -16,6 +19,8 @@ export class GridApplication {
     private rowcolResize: ResizeRowCol;
     private gridSelection: GridSelection;
     private keyboardSelection: KeyboardSelection;
+
+    private mouseController: MouseController;
 
     constructor() {
         this.state = new GridState();
@@ -33,26 +38,44 @@ export class GridApplication {
         this.rowcolResize = new ResizeRowCol(this.state);
         this.gridSelection = new GridSelection(this.state);
         this.keyboardSelection = new KeyboardSelection(this.state);
+
+        this.mouseController = new MouseController(this.state);
         
         this.initListeners();
+        this.updateScrollDimensions();
         this.grid.render();
     }
 
     private initListeners(): void {
-        this.misc.initialize();
-        this.editing.initialize();
-        this.rowcolResize.initialize();
-        this.gridSelection.initialize();
-        this.keyboardSelection.initialize();
+        // this.misc.initialize();
+        // this.editing.initialize();
+        // this.rowcolResize.initialize();
+        // this.gridSelection.initialize();
+        // this.keyboardSelection.initialize();
+        
+        this.mouseController.setUpListeners();
     }
 
 
     public destroy(): void {
-        this.misc.destroyListeners();
-        this.editing.destroyListeners();
-        this.rowcolResize.destroyListeners();
-        this.keyboardSelection.destroyListeners();
-        this.gridSelection.destroyListeners();
+        // this.misc.destroyListeners();
+        // this.editing.destroyListeners();
+        // this.rowcolResize.destroyListeners();
+        // this.keyboardSelection.destroyListeners();
+        // this.gridSelection.destroyListeners();
+
+        this.mouseController.destroyListeners();
     }
+
+    private updateScrollDimensions = (): void => {
+        let totalWidth = 0;
+        for (let c = 0; c < MAX_COLUMNS; c++) totalWidth += Column.getWidth(c);
+        
+        let totalHeight = 0;
+        for (let r = 0; r < MAX_ROWS; r++) totalHeight += Row.getHeight(r);
+
+        this.state.spacer.style.width = `${totalWidth + HEADER_WIDTH}px`;
+        this.state.spacer.style.height = `${totalHeight + HEADER_HEIGHT}px`;
+    };
 
 }

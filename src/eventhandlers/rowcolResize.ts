@@ -1,10 +1,9 @@
 import { HEADER_HEIGHT, HEADER_WIDTH, MAX_COLUMNS, MAX_ROWS, RESIZE_THRESHOLD } from "../config/constants.js";
 import type { Grid } from "../grid.js";
 import { Column, Row } from "../utils/rowcolumn.js";
-import type { Handler } from "./eventhandler.js";
 import type { GridState } from "./gridState.js";
 
-export class ResizeRowCol implements Handler{
+export class ResizeRowCol{
     private grid: Grid;
     private gridState : GridState;
 
@@ -17,7 +16,7 @@ export class ResizeRowCol implements Handler{
         this.gridState.canvas.addEventListener('pointerdown', this.handleMouseDown);
         window.addEventListener('pointermove', this.handleMouseMove);
         window.addEventListener('pointerup', this.handleMouseUp);
-        this.updateScrollDimensions();
+        // this.updateScrollDimensions();
     }
 
     public destroyListeners() {

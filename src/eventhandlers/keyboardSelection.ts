@@ -1,10 +1,9 @@
 import { MAX_COLUMNS, MAX_ROWS } from "../config/constants.js";
 import type { Grid } from "../grid.js";
 import { Column, Row } from "../utils/rowcolumn.js";
-import type { Handler } from "./eventhandler.js";
 import type { GridState } from "./gridState.js";
 
-export class KeyboardSelection implements Handler{
+export class KeyboardSelection{
     private grid: Grid;
     private gridState : GridState;
 

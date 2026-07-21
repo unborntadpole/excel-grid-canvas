@@ -2,6 +2,7 @@ import { CellRange } from "../cell.js";
 import { DataStore } from "../datastore.js";
 import { Grid } from "../grid.js";
 import { CopyPaste } from "../utils/copypaste.js";
+import { EditCell } from "./mouse/cellEditing.js";
 
 export interface GridState {
     container: HTMLDivElement;
@@ -21,6 +22,8 @@ export interface GridState {
     copyObject: CopyPaste | null;
     currentEditingCell: { row: number; col: number } | null;
     currentSelectedCell: { row:number; col: number } | null;
+    lastClick: number;
+    editing: EditCell;
 }
 
 export class GridState implements GridState {
@@ -41,7 +44,12 @@ export class GridState implements GridState {
         this.copyObject = null;
         this.currentEditingCell = null;
         this.currentSelectedCell = null;
+        this.lastClick = 0;
         performance.mark('grid-init-start');
         this.grid = new Grid(this.canvas);
+        this.editing = new EditCell(this);
+    }
+    public timeClick(): void {
+        this.lastClick = performance.now();
     }
 }

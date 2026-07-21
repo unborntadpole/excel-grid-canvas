@@ -2,10 +2,9 @@
 
 import type { Grid } from "../grid.js";
 import { CopyPaste } from "../utils/copypaste.js";
-import type { Handler } from "./eventhandler.js";
 import type { GridState } from "./gridState.js";
 
-export class Misc implements Handler{
+export class Misc{
     private grid: Grid;
     private gridState : GridState;
 
