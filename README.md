@@ -39,12 +39,23 @@ The objective of this project is to build a high-performance, Excel-like spreads
     - `datastore.ts`: Class for storing cell data and row heights and column widths securely.
 
 - `src/eventhandlers`
-    - `gridState.ts`: Class to handle state variables.
-    - `editing.ts`: Handles the pointer and keyboard events for input.
-    - `gridSelection.ts`: Handles the pointer events for selection.
-    - `keyboardSelection.ts`: Handles the keyboard event for selection.
-    - `misc.ts`: Handles copy paste, undo redo, resize window, scroll, initial sizing of canvas.
-    - `rowcolResize.ts`: Handles resizing of row and column.
+    - `src/eventhandlers/keyboard`: has all handlers for keyboard input
+        - `keyboardController.ts`: Main controller for all the listeners
+        - `cellEditing.ts`: Handles editing mode enter and exit
+        - `selection.ts`: Handles arrow keys
+        - ``:
+        - ``:
+        - ``:
+    - `src/eventhandlers/mouse`: has all handlers for mouse input
+        - `mouseController`: Main controller for all the listeners
+        - `colResize.ts`: Handles column resize
+        - `rowResize.ts`: Handles row resize
+        - `cellSelection.ts`: Handles cell selection and double click for editing
+        - `colHeaderSelection.ts`: Handles column header selection
+        - `rowHeaderSelection.ts`: Handles row header selection
+    - `src/eventhandlers/misc`: has misc handlers
+        - `miscListeners.ts`: Handles scroll, resize and file change.
+    - `editing.ts`: Helper class to handle cell edit.
 
 - `src/utils`
     - `generator.ts`:  Backup class for data generation when json file from default import is not found.
