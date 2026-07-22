@@ -42,10 +42,10 @@ The objective of this project is to build a high-performance, Excel-like spreads
     - `src/eventhandlers/keyboard`: has all handlers for keyboard input
         - `keyboardController.ts`: Main controller for all the listeners
         - `cellEditing.ts`: Handles editing mode enter and exit
-        - `selection.ts`: Handles arrow keys
-        - ``:
-        - ``:
-        - ``:
+        - `selection.ts`: Handles arrow keys and selection via keyboard
+        - `copyapaste.ts`: Handles copy and paste
+        - `importjson.ts`: Handles importing json
+        - `undoredo.ts`: Handles undo and redo
     - `src/eventhandlers/mouse`: has all handlers for mouse input
         - `mouseController`: Main controller for all the listeners
         - `colResize.ts`: Handles column resize
