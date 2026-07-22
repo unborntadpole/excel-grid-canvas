@@ -1,26 +1,20 @@
 import {Grid} from './grid.js';
 import { GridState } from './eventhandlers/gridState.js';
-import { ResizeRowCol } from './eventhandlers/rowcolResize.js';
-import { GridSelection } from './eventhandlers/gridSelection.js';
-import { KeyboardSelection } from './eventhandlers/keyboardSelection.js';
-import { Editing } from './eventhandlers/editing.js';
-import { Misc } from './eventhandlers/misc.js';
 import { HEADER_HEIGHT, HEADER_WIDTH, MAX_COLUMNS, MAX_ROWS } from './config/constants.js';
 import { Column, Row } from './utils/rowcolumn.js';
 import { MouseController } from './eventhandlers/mouse/mouseController.js';
+import { KeyboardController } from './eventhandlers/keyboard/keyboardController.js';
+import { MiscController } from './eventhandlers/misc/miscListeners.js';
 
 
 export class GridApplication {
     public grid: Grid;
 
     private state: GridState;
-    private misc: Misc;
-    private editing: Editing;
-    private rowcolResize: ResizeRowCol;
-    private gridSelection: GridSelection;
-    private keyboardSelection: KeyboardSelection;
 
     private mouseController: MouseController;
+    private keyboardController: KeyboardController;
+    private miscController: MiscController;
 
     constructor() {
         this.state = new GridState();
@@ -33,38 +27,31 @@ export class GridApplication {
         performance.clearMarks();
         performance.clearMeasures();
 
-        this.misc = new Misc(this.state);
-        this.editing = new Editing(this.state);
-        this.rowcolResize = new ResizeRowCol(this.state);
-        this.gridSelection = new GridSelection(this.state);
-        this.keyboardSelection = new KeyboardSelection(this.state);
-
         this.mouseController = new MouseController(this.state);
+        this.keyboardController = new KeyboardController(this.state);
+        this.miscController = new MiscController(this.state);
+
         
         this.initListeners();
+        this.initCanvasSizing();
         this.updateScrollDimensions();
         this.grid.render();
     }
 
     private initListeners(): void {
-        // this.misc.initialize();
-        // this.editing.initialize();
-        // this.rowcolResize.initialize();
-        // this.gridSelection.initialize();
-        // this.keyboardSelection.initialize();
         
         this.mouseController.setUpListeners();
+        this.keyboardController.setUpListeners();
+        this.miscController.setUpListeners();
+        
     }
 
 
     public destroy(): void {
-        // this.misc.destroyListeners();
-        // this.editing.destroyListeners();
-        // this.rowcolResize.destroyListeners();
-        // this.keyboardSelection.destroyListeners();
-        // this.gridSelection.destroyListeners();
 
         this.mouseController.destroyListeners();
+        this.keyboardController.destroyListeners();
+        this.miscController.destroyListeners();
     }
 
     private updateScrollDimensions = (): void => {
@@ -77,5 +64,22 @@ export class GridApplication {
         this.state.spacer.style.width = `${totalWidth + HEADER_WIDTH}px`;
         this.state.spacer.style.height = `${totalHeight + HEADER_HEIGHT}px`;
     };
+
+    private initCanvasSizing(): void {    
+        const width = this.state.container.clientWidth;
+        const height = this.state.container.clientHeight;
+        const dpr = window.devicePixelRatio || 1;
+
+        this.state.canvas.width = width * dpr;
+        this.state.canvas.height = height * dpr;
+
+        this.state.canvas.style.width = `${width}px`;
+        this.state.canvas.style.height = `${height}px`;
+
+        const ctx = this.state.canvas.getContext('2d');
+        if (ctx) {
+            ctx.scale(dpr, dpr);
+        }
+    }
 
 }

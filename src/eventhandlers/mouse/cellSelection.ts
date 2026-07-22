@@ -1,7 +1,6 @@
 import { DOUBLECLICK_TIME, HEADER_HEIGHT, HEADER_WIDTH, MAX_COLUMNS, MAX_ROWS } from "../../config/constants.js";
 import { Column, Row } from "../../utils/rowcolumn.js";
 import type { GridState } from "../gridState.js";
-import { EditCell } from "./cellEditing.js";
 import type { MouseHandler } from "./mouseController.js";
 
 export class CellSelection implements MouseHandler {
@@ -27,7 +26,6 @@ export class CellSelection implements MouseHandler {
             const diff = performance.now() - this.state.lastClick;
             if (diff < DOUBLECLICK_TIME) {
                 this.state.lastClick = 0;
-                console.log('double click');
                 this.state.editing.startEditing(this.selectedCell);
                 return;
             }
@@ -35,9 +33,7 @@ export class CellSelection implements MouseHandler {
                 this.selectedCell.row,
                 this.selectedCell.col
             );
-            if(
-                this.state.editing.getCurrentEditingCel() !== this.selectedCell
-            ){
+            if(this.state.editing.getCurrentEditingCell()){
                 this.state.editing.commitEditingChanges();
             }
             this.setSelectionEvaluation();

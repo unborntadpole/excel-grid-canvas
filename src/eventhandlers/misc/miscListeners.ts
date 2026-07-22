@@ -1,30 +1,25 @@
-//copy paste, undo redo, resize window, scroll, initial sizing of canvas
+import type { Grid } from "../../grid.js";
+import type { GridState } from "../gridState.js";
 
-import type { Grid } from "../grid.js";
-import { CopyPaste } from "../utils/copypaste.js";
-import type { GridState } from "./gridState.js";
-
-export class Misc{
+export class MiscController {
+    private gridState: GridState;
     private grid: Grid;
-    private gridState : GridState;
+    private isRenderPending = false;
 
     constructor(state: GridState){
         this.gridState = state;
         this.grid = this.gridState.grid;
-        this.initCanvasSizing();
     }
 
-    public initialize() {
+    public setUpListeners() : void {
         this.gridState.container.addEventListener('scroll', this.handleScroll);
-        window.addEventListener('keydown', this.handleWindowKeyDown);
         this.gridState.fileInput.addEventListener('change', this.handleFileChange);
         this.gridState.fileInput.addEventListener('click', this.handleFileClick);
         window.addEventListener('resize', this.handleResize);
     }
 
-    public destroyListeners() {
+    public destroyListeners() : void {
         this.gridState.container.removeEventListener('scroll', this.handleScroll);
-        window.removeEventListener('keydown', this.handleWindowKeyDown);
         this.gridState.fileInput.removeEventListener('change', this.handleFileChange);
         this.gridState.fileInput.removeEventListener('click', this.handleFileClick);
         window.removeEventListener('resize', this.handleResize);
@@ -46,73 +41,23 @@ export class Misc{
             ctx.scale(dpr, dpr);
         }
     }
-        
-    private commitEditingChanges(): void {
-        if (!this.gridState.currentEditingCell) return;
-        this.grid.typeIntoCell(
-            this.gridState.currentEditingCell.row, 
-            this.gridState.currentEditingCell.col, 
-            this.gridState.editor.value
-        );
-        this.gridState.editor.style.display = 'none';
-        this.gridState.currentEditingCell = null;
-    }
 
     private handleScroll = (): void => {
         this.grid.scrollX = this.gridState.container.scrollLeft;
         this.grid.scrollY = this.gridState.container.scrollTop;
         
-        if (this.gridState.currentEditingCell) this.commitEditingChanges();
-        this.grid.render();
-    };
-
-    private handleWindowKeyDown = async (e: KeyboardEvent): Promise<void> => {
-        if (document.activeElement === this.gridState.editor) return;
-        const key = e.key.toLowerCase();
-        if (e.ctrlKey && key === 'i') {
-            e.preventDefault();
-            await this.grid.renderJSON();
-            return;
-        }
-        if (e.ctrlKey && e.code == 'KeyC'){
-            e.preventDefault();
-            if (!this.grid.selection.boundedRange) return;
-            this.gridState.copyObject = new CopyPaste(this.grid.selection.boundedRange);
-            return;
-        }
-        if (e.ctrlKey && e.code == 'KeyV'){
-            e.preventDefault();
-            if (!this.gridState.currentSelectedCell || !this.gridState.copyObject) return;
-            this.grid.paste(
-                this.gridState.copyObject, 
-                this.gridState.currentSelectedCell.row, 
-                this.gridState.currentSelectedCell.col
-            );
-            this.grid.render();
-            return;
-        }
-        if (e.ctrlKey && e.code == 'KeyO'){
-            e.preventDefault();
-            document.getElementById('loaded-file')?.click();
-            return;
-        }
-        if (e.ctrlKey || e.metaKey) {
-            if (key === 'z') {
-                e.preventDefault();
-                if (e.shiftKey) {
-                    this.grid.redo();
-                } 
-                else {
-                    this.grid.undo();
-                }
-            } 
-            else if (key === 'y') {
-                e.preventDefault();
-                this.grid.redo();
-            }
-            return;
+        if (this.gridState.editing.getCurrentEditingCell()) 
+            this.gridState.editing.commitEditingChanges();
+        
+        if (!this.isRenderPending) {
+            this.isRenderPending = true;
+            requestAnimationFrame(() => {
+                this.grid.render();
+                this.isRenderPending = false;
+            });
         }
     };
+    
     private handleFileChange = async (event: Event) => {
         const target = event.target as HTMLInputElement;
         if (!target.files || target.files.length === 0) {

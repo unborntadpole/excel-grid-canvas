@@ -29,7 +29,7 @@ export class EditCell{
         return { x: X, y: Y, w: w, h: h };
     }
 
-    public getCurrentEditingCel() {
+    public getCurrentEditingCell() {
         return this.currentEditingCell;
     }
 
@@ -57,7 +57,11 @@ export class EditCell{
         );
         this.currentEditingCell = null;
         this.gridState.editor.style.display = 'none';
-        this.gridState.currentEditingCell = null;
+    }
+
+    public cancelEditing(): void {
+        this.gridState.editor.style.display = 'none';
+        this.currentEditingCell = null;
     }
 
 }
