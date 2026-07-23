@@ -1,6 +1,6 @@
-import { DEFAULT_COLUMN_WIDTH, DEFAULT_ROW_HEIGHT, HEADER_HEIGHT, HEADER_WIDTH } from "../../config/constants.js";
-import { Column, Row } from "../../utils/rowcolumn.js";
-import type { GridState } from "../gridState.js";
+import { HEADER_HEIGHT, HEADER_WIDTH } from "./config/constants.js";
+import { Column, Row } from "./utils/rowcolumn.js";
+import type { GridState } from "./eventhandlers/gridState.js";
 
 export class EditCell{
     private currentEditingCell : {row: number, col: number} | null = null;
@@ -11,20 +11,17 @@ export class EditCell{
         let Y = this.gridState.grid.scrollY;
 
         X += HEADER_WIDTH;
-        let w = DEFAULT_COLUMN_WIDTH;
         for (let c = 0; c < column; c++) {
-            w = Column.getWidth(c);
-            X += w;
+            X += Column.getWidth(c);
         }
-        w = Column.getWidth(column+1);
+        let w = Column.getWidth(column);
 
-        Y = HEADER_HEIGHT;
-        let h = DEFAULT_ROW_HEIGHT;
+        Y += HEADER_HEIGHT;
         for (let r = 0; r < row; r++) {
-            h = Row.getHeight(r);
-            Y += h;
+            Y += Row.getHeight(r);
+            
         }
-        h = Row.getHeight(row+1);
+        let h = Row.getHeight(row);
 
         return { x: X, y: Y, w: w, h: h };
     }

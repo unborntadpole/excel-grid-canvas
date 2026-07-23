@@ -50,6 +50,7 @@ export class RowHeaderSelection implements MouseHandler {
     public pointerMove(mouseX: number, mouseY: number): void {
         this.setCurrentRow(mouseX,mouseY);
         this.state.grid.selection.updateDragRange(this.indexR,this.indexC);
+        this.setSelectionEvaluation();
     }
 
     public pointerUp(mouseX: number, mouseY: number): void {
@@ -58,7 +59,7 @@ export class RowHeaderSelection implements MouseHandler {
 
 
     private setSelectionEvaluation(): void {
-        if (this.state.grid.selection.boundedRange) return;
+        if (!this.state.grid.selection.boundedRange) return;
         const evaluation = this.state.grid.selection.evaluate();
         document.getElementById("field-count")!.textContent = evaluation.count!;
         document.getElementById("field-min")!.textContent = evaluation.min!;

@@ -1,6 +1,6 @@
 import type { Grid } from "../../grid.js";
 import type { GridState } from "../gridState.js";
-import type { EditCell } from "../mouse/editing.js";
+import type { EditCell } from "../../editing.js";
 import type { KeyboardHandler } from "./keyboardController.js";
 
 export class KeyboardEditing implements KeyboardHandler {

@@ -1,6 +1,6 @@
 import { DataStore } from "../datastore.js";
 import { Grid } from "../grid.js";
-import { EditCell } from "./editing.js";
+import { EditCell } from "../editing.js";
 
 export interface GridState {
     container: HTMLDivElement;

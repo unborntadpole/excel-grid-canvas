@@ -80,6 +80,7 @@ export class KeyboardSelection implements KeyboardHandler {
     }
 
     private setSelectionEvaluation(): void {
+        
         if (!this.grid.selection.boundedRange) return;
         const evaluation = this.grid.selection.evaluate();
         document.getElementById("field-count")!.textContent = evaluation.count!;

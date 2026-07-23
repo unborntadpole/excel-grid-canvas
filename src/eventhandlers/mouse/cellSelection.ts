@@ -77,7 +77,7 @@ export class CellSelection implements MouseHandler {
     }
 
     private setSelectionEvaluation(): void {
-        if (this.state.grid.selection.boundedRange) return;
+        if (!this.state.grid.selection.boundedRange) return;
         const evaluation = this.state.grid.selection.evaluate();
         document.getElementById("field-count")!.textContent = evaluation.count!;
         document.getElementById("field-min")!.textContent = evaluation.min!;
