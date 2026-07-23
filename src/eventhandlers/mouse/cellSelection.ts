@@ -12,8 +12,6 @@ export class CellSelection implements MouseHandler {
         const absoluteY = mouseY + this.state.grid.scrollY;
         this.selectedCell = null;
         if (absoluteX > HEADER_WIDTH && absoluteY > HEADER_HEIGHT){
-            const cell = this.getCellAtPos(mouseX, mouseY);
-            this.selectedCell = {'row': cell.row, 'col': cell.col};
             return true;
         }
         return false;
@@ -22,6 +20,8 @@ export class CellSelection implements MouseHandler {
     public pointerChange(): void {}
 
     public pointerDown(mouseX:number, mouseY:number): void {
+        const cell = this.getCellAtPos(mouseX, mouseY);
+        this.selectedCell = {'row': cell.row, 'col': cell.col};
         if(this.selectedCell){
             const diff = performance.now() - this.state.lastClick;
             if (diff < DOUBLECLICK_TIME) {
